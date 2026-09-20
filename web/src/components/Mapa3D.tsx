@@ -2,7 +2,7 @@
  * La altura representa la métrica activa (explícita en la leyenda del
  * contenedor). Controles: inclinación, rotación, restablecer; el cambio a 2D
  * es inmediato desde el conmutador del contenedor. */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import DeckGL from "@deck.gl/react";
 import { PolygonLayer } from "@deck.gl/layers";
 import { AmbientLight, DirectionalLight, LightingEffect, MapView, LinearInterpolator } from "@deck.gl/core";
@@ -19,6 +19,7 @@ interface Props {
   maxV: number;
   metrica: "conteo" | "tasa";
   onSeleccion?: (cve: string) => void;
+  onFallo: () => void;
   fmt: (v: number | null) => string;
 }
 
@@ -43,6 +44,16 @@ const hexARgb = (hex: string): [number, number, number] => {
 };
 
 export default function Mapa3D(p: Props) {
+  const contenedor=useRef<HTMLDivElement>(null);
+  const [calidad,setCalidad]=useState(1);
+  useEffect(()=>{
+    const node=contenedor.current;
+    const perdido=()=>p.onFallo();
+    node?.addEventListener("webglcontextlost",perdido,true);
+    const ajustar=()=>{const n=navigator as Navigator & {deviceMemory?:number};const limitada=matchMedia("(pointer:coarse)").matches||(n.deviceMemory!=null&&n.deviceMemory<=4)||navigator.hardwareConcurrency<=4;setCalidad(document.documentElement.dataset.efectos==="cinematico"&&!limitada?Math.min(devicePixelRatio||1,1.5):1);};
+    ajustar();const obs=new MutationObserver(ajustar);obs.observe(document.documentElement,{attributes:true,attributeFilter:["data-efectos"]});window.addEventListener("resize",ajustar);
+    return()=>{node?.removeEventListener("webglcontextlost",perdido,true);obs.disconnect();window.removeEventListener("resize",ajustar);};
+  },[p.onFallo]);
   const luces = useMemo(() => [new LightingEffect({
     ambiente: new AmbientLight({ color: [215, 232, 255], intensity: 1.1 }),
     principal: new DirectionalLight({ color: [255, 255, 255], intensity: 1.8, direction: [-2, -3, -4] }),
@@ -101,7 +112,7 @@ export default function Mapa3D(p: Props) {
   const inclina = (delta: number) => setVista(v => ({ ...v, pitch: Math.max(0, Math.min(70, (v.pitch ?? 0) + delta)) }));
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "clamp(360px, 55vw, 560px)" }}>
+    <div className="mapa-3d-escena" ref={contenedor} style={{ position: "relative", width: "100%", height: "clamp(360px, 55vw, 560px)" }}>
       <label className="mapa-relieve no-imprimir" style={{position:"absolute",left:12,bottom:64,zIndex:5,background:"var(--surface)",padding:8,borderRadius:8}}>Relieve visual <input aria-label="Intensidad del relieve 3D" type="range" min="0" max="1" step="0.1" value={relieve} onChange={e=>setRelieve(Number(e.target.value))}/></label>
       <DeckGL
         views={new MapView({ orthographic: ortografica })}
@@ -110,7 +121,8 @@ export default function Mapa3D(p: Props) {
         controller={{ dragRotate: true, touchRotate: true, inertia: !reducirMovimiento }}
         layers={[capa]}
         effects={luces}
-        useDevicePixels={Math.min(window.devicePixelRatio || 1, 1.5)}
+        useDevicePixels={calidad}
+        onError={()=>p.onFallo()}
         getTooltip={tooltip}
         onClick={(info: PickingInfo) => {
           const d = info.object as (typeof datos)[number] | undefined;

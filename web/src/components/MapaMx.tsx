@@ -1,4 +1,5 @@
-import { lazy, Suspense, useId, useMemo, useRef, useState } from "react";
+import Limite3D from "./Limite3D";
+import { lazy, Suspense, useCallback, useId, useMemo, useRef, useState } from "react";
 import type { Territorio } from "../lib/geo";
 import { marcoDe, rutaSVG, cortesCuantiles, clase } from "../lib/geo";
 import { SECUENCIAL } from "../theme/paleta";
@@ -25,11 +26,17 @@ interface Props {
 export const soportaWebGL = (() => {
   try {
     const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+    const gl=c.getContext("webgl2");
+    if(!gl)return false;
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    return true;
   } catch { return false; }
 })();
 
 export default function MapaMx(p: Props) {
+  const [fallo3D,setFallo3D]=useState(false);
+  const [consulta,setConsulta]=useState("");
+  const fallo=useCallback(()=>{setFallo3D(true);p.onModo("2d");},[p.onModo]);
   const uid = useId().replace(/:/g, "");
   const sinDatoId = `sin-dato-${uid}`, relieveId = `relieve-${uid}`;
   const oscuro = document.documentElement.getAttribute("data-theme") === "dark" ||
@@ -56,25 +63,28 @@ export default function MapaMx(p: Props) {
   const fmt = (v: number | null) => v == null ? "sin información"
     : p.metrica === "conteo" ? `${fEntero(v)} delitos` : `${fTasa(v)} por 100 mil`;
 
-  const el3D = p.modo === "3d" && soportaWebGL;
+  const el3D = p.modo === "3d" && soportaWebGL && !fallo3D;
 
   return (
     <div className="tarjeta mapa-caja" ref={cajaRef} aria-label={p.titulo}>
       <div className="mapa-controles no-imprimir">
         <div className="seg" role="group" aria-label="Modo de vista del mapa">
-          <button aria-pressed={p.modo === "2d"} onClick={() => p.onModo("2d")}>2D</button>
-          <button aria-pressed={p.modo === "3d"} onClick={() => p.onModo("3d")}
-            disabled={!soportaWebGL}
+          <button aria-pressed={!el3D} onClick={() => p.onModo("2d")}>2D</button>
+          <button aria-pressed={el3D} onClick={() => p.onModo("3d")}
+            disabled={!soportaWebGL || fallo3D}
             title={soportaWebGL ? "Extrusión 3D" : "WebGL no disponible en este dispositivo; se conserva la vista 2D"}>3D</button>
         </div>
       </div>
 
+      {(!soportaWebGL||fallo3D)&&<p className="nota" role="status">Vista 2D activa: {fallo3D?"la vista 3D no pudo mantenerse":"WebGL 2 no está disponible"}. Se conservan los mismos valores y la selección territorial.</p>}
       {el3D ? (
+        <Limite3D onFallo={fallo}>
         <Suspense fallback={<p className="nota" style={{ padding: 20 }}>Cargando vista 3D…</p>}>
           <Mapa3D territorios={p.territorios} valores={p.valores} rampa={rampa}
             cortes={cortes} maxV={maxV} metrica={p.metrica}
-            onSeleccion={p.onSeleccion} fmt={fmt} />
+            onSeleccion={p.onSeleccion} fmt={fmt} onFallo={fallo} />
         </Suspense>
+        </Limite3D>
       ) : (
         <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}
           role="group" aria-label={`${p.titulo}. Mapa coroplético; los valores exactos están en la tabla adjunta.`}>
@@ -135,6 +145,7 @@ export default function MapaMx(p: Props) {
         );
       })()}
 
+      <div className="mapa-consulta"><label htmlFor={`consulta-${uid}`}>Consultar o seleccionar territorio</label><select id={`consulta-${uid}`} className="control" value={p.territorios.some(t=>t.cve===consulta)?consulta:""} onChange={e=>{setConsulta(e.target.value);if(e.target.value)p.onSeleccion?.(e.target.value);}}><option value="">Selecciona un territorio</option>{p.territorios.map(t=><option key={t.cve} value={t.cve}>{t.nombre}</option>)}</select><output aria-live="polite">{consulta&&p.territorios.some(t=>t.cve===consulta)?`${p.territorios.find(t=>t.cve===consulta)?.nombre}: ${fmt(p.valores[consulta]?.v??null)}`:"Disponible con pantalla táctil y teclado, en 2D y 3D."}</output></div>
       <div className="mapa-leyenda">
         <strong style={{ fontSize: 11, color: "var(--ink-2)" }}>
           {p.metrica === "conteo" ? "Delitos registrados" : "Tasa por 100 mil hab."}
