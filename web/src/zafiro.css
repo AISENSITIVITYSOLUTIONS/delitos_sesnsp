@@ -1,0 +1,16 @@
+/* Grafito y zafiro. Interacción azul; polaridad estadística independiente. */
+:root{--delta-down:#176C60;--delta-up:#A54831;--delta-zero:#526173;--accent:var(--acento)}
+:root[data-theme=dark]{--page:#0B1220;--surface:#172337;--surface-2:#1E2C42;--header:#0B1220;--header-2:#172337;--ink:#F2F6FC;--ink-2:#B4C3D8;--ink-3:#A2B3CB;--grid:#29394E;--axis:#53647D;--border:#B4C3D820;--border-strong:#B4C3D83D;--marino:#459CFF;--acento:#A7CFFF;--petroleo:#80CBBE;--delta-down:#80CBBE;--delta-up:#EBA18C;--delta-zero:#B4C3D8;--s1:#C2A5F0;--s2:#E4C786;--s3:#9AD0C4;--s4:#A9BCCB;--s5:#E8A7D1}
+html[data-theme=dark] body,html[data-theme=dark] .encabezado{background:var(--page)}
+html[data-theme=dark] .tarjeta{background:var(--surface)}
+html :is(.tarjeta,.hallazgo,.impacto-kpis article,.resumen-grid>article){border:1px solid var(--border)!important;box-shadow:0 5px 16px #0002!important;background:var(--surface);text-shadow:none}
+html :is(.impacto-kpis article,.hallazgo)::after{background:linear-gradient(130deg,#ffffff05,transparent 55%)!important}
+html[data-efectos=cinematico] :is(.hallazgo,.impacto-kpis article).fx-active{box-shadow:0 12px 26px #0004!important;border-color:var(--border-strong)!important}
+html .impacto-kpis article>strong{text-shadow:none!important;color:var(--ink)}
+html .impacto-hero{background:linear-gradient(115deg,var(--surface),var(--page))!important;box-shadow:inset 0 1px 0 #ffffff0a,0 10px 24px #0002!important}
+html .impacto-hero::before,html .impacto-hero::after{box-shadow:none!important;opacity:.18;border-color:#A7CFFF!important}
+html .fx-diamond{text-shadow:none;color:var(--acento)}
+html .fx-toolbar button[aria-pressed=true],html .boton--primario,html .seg button[aria-pressed=true],html .tab-delito[aria-selected=true]{background:#245EA0!important;color:#fff!important;border-color:#459CFF!important;box-shadow:0 0 12px #459CFF28!important}
+html .barra-pista>span{background-image:none}
+.cambio{font-variant-numeric:tabular-nums}.cambio small{font-size:12px;font-weight:400}.cambio--baja,.hallazgo__comp--baja{color:var(--delta-down)!important}.cambio--alza,.hallazgo__comp--alza{color:var(--delta-up)!important}.cambio--igual,.cambio--sin-dato{color:var(--delta-zero)}
+html .impacto-kpis .cambio small{display:block;margin-top:6px}

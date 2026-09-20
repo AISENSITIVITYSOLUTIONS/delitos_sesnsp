@@ -1,3 +1,4 @@
+import { colorDelito } from "../theme/paleta";
 import { useMemo, useRef, useState } from "react";
 import Grafica, { tokens } from "./Grafica";
 import type { SeriesNacionales, PoblacionAnual } from "../lib/contratos";
@@ -46,7 +47,7 @@ export default function PanelDelito(p: Props) {
   }, [p.sn, p.delitoId, ultimo]);
 
   const t = tokens();
-  const color = t.series[p.colorIdx % t.series.length];
+  const color = colorDelito(p.delitoId);
 
   const opcion = useMemo<EChartsCoreOption>(() => {
     if (vista === "mensual") {

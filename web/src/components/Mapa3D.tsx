@@ -56,8 +56,8 @@ export default function Mapa3D(p: Props) {
   },[p.onFallo]);
   const luces = useMemo(() => [new LightingEffect({
     ambiente: new AmbientLight({ color: [215, 232, 255], intensity: 1.1 }),
-    principal: new DirectionalLight({ color: [255, 255, 255], intensity: 1.8, direction: [-2, -3, -4] }),
-    relleno: new DirectionalLight({ color: [80, 170, 255], intensity: 0.6, direction: [3, 1, -2] }),
+    principal: new DirectionalLight({ color: [215, 232, 255], intensity: 1.2, direction: [-2, -3, -4] }),
+    relleno: new DirectionalLight({ color: [215, 232, 255], intensity: 0.4, direction: [3, 1, -2] }),
   })], []);
   const [malla, setMalla] = useState(false);
   const [ortografica, setOrtografica] = useState(false);
@@ -90,7 +90,7 @@ export default function Mapa3D(p: Props) {
       return [...hexARgb(p.rampa[Math.min(clase(d.valor, p.cortes), p.rampa.length - 1)]), 235] as [number, number, number, number];
     },
     getLineColor: [255, 255, 255, 60],
-    material: { ambient: 0.42, diffuse: 0.75, shininess: 26, specularColor: [80, 90, 100] },
+    material: { ambient: 0.42, diffuse: 0.75, shininess: 8, specularColor: [35, 40, 48] },
     transitions: reducirMovimiento ? undefined : { getElevation: 420 },
     updateTriggers: { getElevation: [escalaAltura], getFillColor: [p.rampa, p.cortes] },
   }), [datos, escalaAltura, p.rampa, p.cortes, reducirMovimiento, malla]);

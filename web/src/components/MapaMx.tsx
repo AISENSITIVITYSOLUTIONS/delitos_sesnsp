@@ -2,7 +2,7 @@ import Limite3D from "./Limite3D";
 import { lazy, Suspense, useCallback, useId, useMemo, useRef, useState } from "react";
 import type { Territorio } from "../lib/geo";
 import { marcoDe, rutaSVG, cortesCuantiles, clase } from "../lib/geo";
-import { SECUENCIAL } from "../theme/paleta";
+import { SECUENCIAL, DIVERGENTE, indiceCambio } from "../theme/paleta";
 import { fEntero, fTasa } from "../lib/formato";
 
 const Mapa3D = lazy(() => import("./Mapa3D"));
@@ -21,6 +21,7 @@ interface Props {
   /** Escala fija opcional (máximo del periodo completo en comparaciones). */
   maxFijo?: number;
   notaEscala?: string;
+  variacion?: boolean;
 }
 
 export const soportaWebGL = (() => {
@@ -41,29 +42,30 @@ export default function MapaMx(p: Props) {
   const sinDatoId = `sin-dato-${uid}`, relieveId = `relieve-${uid}`;
   const oscuro = document.documentElement.getAttribute("data-theme") === "dark" ||
     (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
-  const rampa = SECUENCIAL[oscuro ? "dark" : "light"];
+  const rampa = (p.variacion ? DIVERGENTE : SECUENCIAL)[oscuro ? "dark" : "light"];
   const marco = useMemo(() => marcoDe(p.territorios), [p.territorios]);
   const [hover, setHover] = useState<{ cve: string; x: number; y: number } | null>(null);
   const cajaRef = useRef<HTMLDivElement>(null);
 
   const valoresNum = useMemo(() =>
-    Object.values(p.valores).map(d => d.v).filter((v): v is number => v != null && v > 0),
-    [p.valores]);
+    Object.values(p.valores).map(d => d.v).filter((v): v is number => v != null && (p.variacion || v > 0)),
+    [p.valores,p.variacion]);
   const cortes = useMemo(() => cortesCuantiles(valoresNum, 7), [valoresNum]);
-  const maxV = p.maxFijo ?? (valoresNum.length ? Math.max(...valoresNum) : 0);
+  const maxV = p.maxFijo ?? (valoresNum.length ? Math.max(...valoresNum.map(Math.abs)) : 0);
 
   const colorDe = (cve: string): string => {
     const d = p.valores[cve];
     if (!d || d.v == null) return `url(#${sinDatoId})`;
+    if(p.variacion)return rampa[indiceCambio(d.v,maxV)];
     if (d.v === 0) return "var(--surface)";
     return rampa[Math.min(clase(d.v, cortes), rampa.length - 1)];
   };
 
   const W = 920, H = 560;
   const fmt = (v: number | null) => v == null ? "sin información"
-    : p.metrica === "conteo" ? `${fEntero(v)} delitos` : `${fTasa(v)} por 100 mil`;
+    : p.variacion ? `${v>0?"↑ +":v<0?"↓ ":"↔ "}${fEntero(v)} delitos · ${v>0?"aumento":v<0?"descenso":"sin cambio"}` : p.metrica === "conteo" ? `${fEntero(v)} delitos` : `${fTasa(v)} por 100 mil`;
 
-  const el3D = p.modo === "3d" && soportaWebGL && !fallo3D;
+  const el3D = !p.variacion && p.modo === "3d" && soportaWebGL && !fallo3D;
 
   return (
     <div className="tarjeta mapa-caja" ref={cajaRef} aria-label={p.titulo}>
@@ -71,7 +73,7 @@ export default function MapaMx(p: Props) {
         <div className="seg" role="group" aria-label="Modo de vista del mapa">
           <button aria-pressed={!el3D} onClick={() => p.onModo("2d")}>2D</button>
           <button aria-pressed={el3D} onClick={() => p.onModo("3d")}
-            disabled={!soportaWebGL || fallo3D}
+            disabled={p.variacion || !soportaWebGL || fallo3D}
             title={soportaWebGL ? "Extrusión 3D" : "WebGL no disponible en este dispositivo; se conserva la vista 2D"}>3D</button>
         </div>
       </div>
@@ -148,16 +150,16 @@ export default function MapaMx(p: Props) {
       <div className="mapa-consulta"><label htmlFor={`consulta-${uid}`}>Consultar o seleccionar territorio</label><select id={`consulta-${uid}`} className="control" value={p.territorios.some(t=>t.cve===consulta)?consulta:""} onChange={e=>{setConsulta(e.target.value);if(e.target.value)p.onSeleccion?.(e.target.value);}}><option value="">Selecciona un territorio</option>{p.territorios.map(t=><option key={t.cve} value={t.cve}>{t.nombre}</option>)}</select><output aria-live="polite">{consulta&&p.territorios.some(t=>t.cve===consulta)?`${p.territorios.find(t=>t.cve===consulta)?.nombre}: ${fmt(p.valores[consulta]?.v??null)}`:"Disponible con pantalla táctil y teclado, en 2D y 3D."}</output></div>
       <div className="mapa-leyenda">
         <strong style={{ fontSize: 11, color: "var(--ink-2)" }}>
-          {p.metrica === "conteo" ? "Delitos registrados" : "Tasa por 100 mil hab."}
+          {p.variacion ? "Cambio absoluto del registro · centro 0" : p.metrica === "conteo" ? "Delitos registrados" : "Tasa por 100 mil hab."}
         </strong>
         <div className="escala" aria-hidden="true">{rampa.map(c => <i key={c} style={{ background: c }} />)}</div>
-        <div className="extremos"><span>{p.metrica === "conteo" ? "1" : "> 0"}</span><span>{p.metrica === "conteo" ? fEntero(maxV) : fTasa(maxV)}</span></div>
+        <div className="extremos"><span>{p.variacion ? `−${fEntero(maxV)} · descenso` : p.metrica === "conteo" ? "1" : "> 0"}</span><span>{p.variacion ? `+${fEntero(maxV)} · aumento` : p.metrica === "conteo" ? fEntero(maxV) : fTasa(maxV)}</span></div>
         <div className="fila" style={{ gap: 12, marginTop: 6 }}>
-          <span className="leyenda-item"><i style={{ width: 11, height: 11, borderRadius: 3, background: "var(--surface)", border: "1px solid var(--axis)", display: "inline-block" }} /> cero reportado</span>
+          <span className="leyenda-item"><i style={{ width: 11, height: 11, borderRadius: 3, background: p.variacion ? rampa[3] : "var(--surface)", border: "1px solid var(--axis)", display: "inline-block" }} /> {p.variacion ? "sin cambio (0)" : "cero reportado"}</span>
           <span className="leyenda-item"><i className="sin-dato-swatch" /> sin información</span>
         </div>
         <p className="nota" style={{ marginTop: 4, maxWidth: 220 }}>
-          Clases por cuantiles del periodo mostrado.{p.notaEscala ? ` ${p.notaEscala}` : ""}
+          {p.variacion ? "Intervalos simétricos alrededor de cero; turquesa: descenso, terracota: aumento. Vista 2D para comparar cambios con signo." : "Clases por cuantiles del periodo mostrado."}{p.notaEscala ? ` ${p.notaEscala}` : ""}
         </p>
       </div>
     </div>

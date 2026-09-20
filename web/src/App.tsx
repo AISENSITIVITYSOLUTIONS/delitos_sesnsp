@@ -1,3 +1,4 @@
+import { colorDelito } from "./theme/paleta";
 import Efectos3D from "./components/Efectos3D";
 import TerritorioImpacto from "./components/TerritorioImpacto";
 import AltoImpacto from "./components/AltoImpacto";
@@ -14,7 +15,7 @@ import { useEstado } from "./lib/estado";
 import { useState as useStateReact } from "react";
 import { fEntero } from "./lib/formato";
 
-const COLORES_SLOT = ["--s1", "--s2", "--s3", "--s4", "--s5"];
+
 
 function SelectorPaneles({ ranking, sn, pob, desde, hasta, fuenteTexto }: {
   ranking: { etiqueta: string; delitos: Array<{ delito_id: string; nombre: string; cantidad: number; participacion: number }> };
@@ -30,7 +31,7 @@ function SelectorPaneles({ ranking, sn, pob, desde, hasta, fuenteTexto }: {
         {top5.map((t, i) => (
           <button key={t.delito_id} role="tab" className="tab-delito"
             aria-selected={i === sel} onClick={() => setSel(i)}>
-            <span className="punto" style={{ background: `var(${COLORES_SLOT[i]})` }} aria-hidden="true" />
+            <span className="punto" style={{ background: colorDelito(t.delito_id) }} aria-hidden="true" />
             <span>{i + 1}. {t.nombre}{esResidual(t.nombre) ? " ⁽ᴿ⁾" : ""}</span>
             <span className="nota" style={{ color: "inherit", opacity: 0.75 }}>{fEntero(t.cantidad)}</span>
           </button>

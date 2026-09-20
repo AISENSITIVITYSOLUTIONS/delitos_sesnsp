@@ -25,7 +25,7 @@ function Spark({ etiquetas, valores }: { etiquetas: string[]; valores: number[] 
 export default function TarjetaHallazgo({ t }: { t: TH }) {
   const titulos: Record<string,string> = {"tendencia-nacional":"Tasa nacional","composicion":"Cambio en la composición","concentracion":"Concentración municipal","volumen-vs-tasa":"Volumen frente a tasa","estacionalidad":"Estacionalidad"};
   const ref = useRef<HTMLDialogElement>(null);
-  const esBaja = t.comparacion.includes("−") || /baj|descen|disminu|-/.test(t.comparacion);
+  // Un hallazgo puede contener varias direcciones: no inferir polaridad del texto.
 
   if (t.insuficiente) {
     return (
@@ -48,7 +48,7 @@ export default function TarjetaHallazgo({ t }: { t: TH }) {
       <p className="hallazgo__periodo">{t.periodo}</p>
 
       <details className="hallazgo-detalle"><summary>Interpretación y tendencia</summary><p>{t.titulo}</p>
-      <p className={`hallazgo__comp ${esBaja ? "hallazgo__comp--baja" : "hallazgo__comp--alza"}`}>{t.comparacion}</p>
+      <p className="hallazgo__comp">{t.comparacion}</p>
         <Spark etiquetas={t.mini.etiquetas} valores={t.mini.valores} />
         <p className="hallazgo__interpretacion">{t.interpretacion}</p>
         <p className="nota">{validezTxt}</p>

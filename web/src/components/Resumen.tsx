@@ -1,3 +1,4 @@
+import { colorDelito } from "../theme/paleta";
 import { useEffect, useState } from "react";
 import Grafica from "./Grafica";
 import MapaMx from "./MapaMx";
@@ -52,7 +53,7 @@ export default function Resumen({ sn, estatal, pob, ranking, municipios, complet
      <p className="nota">{ranking.etiqueta} · cantidades absolutas</p>
      <ol className="resumen-barras">{top.map(d=><li key={d.delito_id}>
        <div><span>{d.nombre}</span><strong>{fEntero(d.cantidad)}</strong></div>
-       <div className="barra-pista"><span style={{width:`${top[0]?.cantidad ? d.cantidad/top[0].cantidad*100 : 0}%`}}/></div>
+       <div className="barra-pista"><span style={{background:colorDelito(d.delito_id),width:`${top[0]?.cantidad ? d.cantidad/top[0].cantidad*100 : 0}%`}}/></div>
      </li>)}</ol>
      <a href="#delitos">Ver tasas y evolución →</a>
    </article>
