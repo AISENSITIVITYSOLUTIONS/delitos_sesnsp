@@ -1,3 +1,4 @@
+import AltoImpacto from "./components/AltoImpacto";
 import Resumen from "./components/Resumen";
 import { useEffect, useMemo, useState } from "react";
 import Encabezado from "./components/Encabezado";
@@ -180,6 +181,7 @@ export default function App() {
       </div>
 
       <main id="contenido" className="contenedor">
+        <AltoImpacto nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} />
         <section className="seccion" id="hallazgos" aria-labelledby="t-hallazgos">
           <div className="seccion__head">
             <span className="seccion__num">01</span>

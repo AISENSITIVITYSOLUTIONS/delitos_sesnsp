@@ -341,3 +341,35 @@ dialog.calculo::backdrop { background: rgba(11, 21, 32, 0.5); backdrop-filter: b
  dialog.calculo { max-height:85dvh; overflow:auto; }
 }
 @media print { .menu-movil { display:none; } .resumen-grid { grid-template-columns:1fr; } }
+
+/* Laboratorio NI: profundidad visual sin deformar las marcas estadísticas. */
+.impacto { scroll-margin-top: 20px; }
+.impacto-hero { display:flex; justify-content:space-between; gap:24px; align-items:center; padding:28px; border:1px solid var(--border); border-radius:16px; background:radial-gradient(ellipse at top right,#0879c82b,transparent 60%),var(--surface); box-shadow:inset 0 1px 0 #ffffff18,0 14px 35px #0002; }
+.impacto-hero h2 { font-size:clamp(26px,3vw,40px); margin:8px 0; }
+.impacto-eyebrow { color:var(--accent); letter-spacing:.18em; font-size:11px; }
+.impacto-badge { border:1px solid var(--axis); border-radius:30px; padding:8px 14px; white-space:nowrap; font-size:12px; }
+.impacto-controles { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin:18px 0 10px; }
+.impacto-controles label { display:flex; flex-direction:column; gap:6px; min-width:0; font-size:12px; }
+.impacto-controles select { width:100%; min-width:0; min-height:44px; }
+.impacto-kpis { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:20px 0; perspective:1200px; }
+.impacto-kpis article { display:flex; flex-direction:column; gap:8px; padding:22px; border:1px solid var(--border); border-top:2px solid #169bff; border-radius:12px; background:linear-gradient(135deg,#169bff10,transparent),var(--surface); box-shadow:inset 0 1px 0 #fff1,0 8px 18px #0002; transition:transform .25s,box-shadow .25s; }
+.impacto-kpis strong { font-size:clamp(26px,3vw,38px); font-variant-numeric:tabular-nums; }
+.impacto-kpis span,.impacto-kpis small { color:var(--ink-2); }
+.impacto-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.impacto-tabs button { min-height:44px; }
+.impacto-tabs [aria-pressed="true"] { background:#087ad4; color:white; border-color:#169bff; }
+.impacto-panel { padding:24px; min-width:0; }
+.impacto-panel>p { margin:12px 0; color:var(--ink-2); max-width:95ch; }
+.impacto-tabla { overflow-x:auto; max-height:480px; margin:16px 0; }
+.impacto-tabla table { width:100%; border-collapse:collapse; font-size:13px; }
+.impacto-tabla td,.impacto-tabla th { padding:12px; text-align:right; border-bottom:1px solid var(--border); }
+.impacto-tabla td:first-child,.impacto-tabla th:first-child { text-align:left; }
+.impacto-tabla th { position:sticky; top:0; background:var(--surface); }
+.impacto-protocolo li { margin:12px 0; }
+.impacto-protocolo ol,.impacto-protocolo ul { padding-left:24px; }
+.impacto-metodo { padding:18px 0; }
+.impacto summary { cursor:pointer; padding:8px 0; }
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) { .impacto-kpis article:hover { transform:translateY(-4px) rotateX(2deg); box-shadow:0 16px 35px #0003,0 0 0 1px #169bff55; } }
+@media(max-width:1100px) { .impacto-controles { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:650px) { .impacto-kpis,.impacto-controles { grid-template-columns:1fr; } .impacto-hero { flex-direction:column; align-items:flex-start; padding:20px; } .impacto-panel { padding:16px; } .impacto-tabs button { flex:1 1 140px; } }
+@media(prefers-reduced-motion:reduce) { .impacto * { transition:none!important; animation:none!important; } }

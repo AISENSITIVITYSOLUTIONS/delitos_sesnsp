@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import DeckGL from "@deck.gl/react";
 import { PolygonLayer } from "@deck.gl/layers";
+import { AmbientLight, DirectionalLight, LightingEffect } from "@deck.gl/core";
 import type { PickingInfo, MapViewState } from "@deck.gl/core";
 import type { Territorio } from "../lib/geo";
 import { clase } from "../lib/geo";
@@ -42,6 +43,11 @@ const hexARgb = (hex: string): [number, number, number] => {
 };
 
 export default function Mapa3D(p: Props) {
+  const luces = useMemo(() => [new LightingEffect({
+    ambiente: new AmbientLight({ color: [215, 232, 255], intensity: 1.1 }),
+    principal: new DirectionalLight({ color: [255, 255, 255], intensity: 1.8, direction: [-2, -3, -4] }),
+    relleno: new DirectionalLight({ color: [80, 170, 255], intensity: 0.6, direction: [3, 1, -2] }),
+  })], []);
   const inicial = useMemo(() => vistaInicial(p.territorios), [p.territorios]);
   const [vista, setVista] = useState<MapViewState>(inicial);
   useEffect(() => { setVista(inicial); }, [inicial]);
@@ -90,13 +96,15 @@ export default function Mapa3D(p: Props) {
   const inclina = (delta: number) => setVista(v => ({ ...v, pitch: Math.max(0, Math.min(70, (v.pitch ?? 0) + delta)) }));
 
   return (
-    <div style={{ position: "relative", width: "100%", height: 560 }}>
+    <div style={{ position: "relative", width: "100%", height: "clamp(360px, 55vw, 560px)" }}>
       <DeckGL
         views={undefined}
         viewState={vista}
         onViewStateChange={({ viewState }) => setVista(viewState as MapViewState)}
         controller={{ dragRotate: true, touchRotate: true, inertia: !reducirMovimiento }}
         layers={[capa]}
+        effects={luces}
+        useDevicePixels={Math.min(window.devicePixelRatio || 1, 1.5)}
         getTooltip={tooltip}
         onClick={(info: PickingInfo) => {
           const d = info.object as (typeof datos)[number] | undefined;
@@ -104,7 +112,7 @@ export default function Mapa3D(p: Props) {
         }}
         style={{ position: "absolute", inset: "0" }}
       />
-      <div style={{ position: "absolute", right: 12, bottom: 12, zIndex: 5, display: "flex", gap: 6 }} className="no-imprimir">
+      <div style={{ position: "absolute", right: 12, bottom: 12, zIndex: 5, display: "flex", flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "calc(100% - 24px)", gap: 6 }} className="no-imprimir">
         <button className="boton" onClick={() => inclina(12)} aria-label="Aumentar inclinación">Inclinar ▲</button>
         <button className="boton" onClick={() => inclina(-12)} aria-label="Reducir inclinación">▼</button>
         <button className="boton" onClick={() => gira(-20)} aria-label="Rotar a la izquierda">⟲</button>
