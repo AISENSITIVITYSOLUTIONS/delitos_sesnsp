@@ -53,6 +53,7 @@ export default function Encabezado({ manifiesto }: { manifiesto: Manifiesto | nu
       <nav id="navegacion" className={`encabezado__nav no-imprimir ${menu ? "menu-abierto" : ""}`} aria-label="Secciones" onClick={e=>{if((e.target as HTMLElement).closest("a"))setMenu(false);}}>
         <div className="sidebar-brand"><span aria-hidden="true" /><div>OBSERVATORIO<br />DE INCIDENCIA DELICTIVA<small>MÉXICO</small></div></div>
         <div className="contenedor">
+          <a href="#laboratorio">◈ Laboratorio de evidencia</a>
           <a href="#alto-impacto">◈ Alto impacto · NI</a>
           <a href="#territorio-impacto">◇ Cambio territorial</a>
           <a href="#hallazgos">⌂ Inicio y hallazgos</a>
