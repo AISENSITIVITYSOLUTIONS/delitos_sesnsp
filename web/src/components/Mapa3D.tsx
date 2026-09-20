@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import DeckGL from "@deck.gl/react";
 import { PolygonLayer } from "@deck.gl/layers";
-import { AmbientLight, DirectionalLight, LightingEffect } from "@deck.gl/core";
+import { AmbientLight, DirectionalLight, LightingEffect, MapView, LinearInterpolator } from "@deck.gl/core";
 import type { PickingInfo, MapViewState } from "@deck.gl/core";
 import type { Territorio } from "../lib/geo";
 import { clase } from "../lib/geo";
@@ -48,6 +48,8 @@ export default function Mapa3D(p: Props) {
     principal: new DirectionalLight({ color: [255, 255, 255], intensity: 1.8, direction: [-2, -3, -4] }),
     relleno: new DirectionalLight({ color: [80, 170, 255], intensity: 0.6, direction: [3, 1, -2] }),
   })], []);
+  const [malla, setMalla] = useState(false);
+  const [ortografica, setOrtografica] = useState(false);
   const [relieve, setRelieve] = useState(1);
   const inicial = useMemo(() => vistaInicial(p.territorios), [p.territorios]);
   const [vista, setVista] = useState<MapViewState>(inicial);
@@ -66,7 +68,9 @@ export default function Mapa3D(p: Props) {
     data: datos,
     getPolygon: (d: (typeof datos)[number]) => d.pols,
     extruded: true,
-    wireframe: false,
+    wireframe: malla,
+    autoHighlight: true,
+    highlightColor: [90, 200, 255, 100],
     pickable: true,
     getElevation: (d: (typeof datos)[number]) => d.valor == null ? 0 : d.valor * escalaAltura,
     getFillColor: (d: (typeof datos)[number]): [number, number, number, number] => {
@@ -78,7 +82,7 @@ export default function Mapa3D(p: Props) {
     material: { ambient: 0.42, diffuse: 0.75, shininess: 26, specularColor: [80, 90, 100] },
     transitions: reducirMovimiento ? undefined : { getElevation: 420 },
     updateTriggers: { getElevation: [escalaAltura], getFillColor: [p.rampa, p.cortes] },
-  }), [datos, escalaAltura, p.rampa, p.cortes, reducirMovimiento]);
+  }), [datos, escalaAltura, p.rampa, p.cortes, reducirMovimiento, malla]);
 
   const tooltip = useCallback((info: PickingInfo) => {
     const d = info.object as (typeof datos)[number] | undefined;
@@ -93,14 +97,14 @@ export default function Mapa3D(p: Props) {
     };
   }, [p]);
 
-  const gira = (delta: number) => setVista(v => ({ ...v, bearing: ((v.bearing ?? 0) + delta) % 360 }));
+  const gira = (delta: number) => setVista(v => ({ ...v, transitionDuration: reducirMovimiento ? 0 : 650, transitionInterpolator: new LinearInterpolator(["bearing"]), bearing: ((v.bearing ?? 0) + delta) % 360 }));
   const inclina = (delta: number) => setVista(v => ({ ...v, pitch: Math.max(0, Math.min(70, (v.pitch ?? 0) + delta)) }));
 
   return (
     <div style={{ position: "relative", width: "100%", height: "clamp(360px, 55vw, 560px)" }}>
       <label className="mapa-relieve no-imprimir" style={{position:"absolute",left:12,bottom:64,zIndex:5,background:"var(--surface)",padding:8,borderRadius:8}}>Relieve visual <input aria-label="Intensidad del relieve 3D" type="range" min="0" max="1" step="0.1" value={relieve} onChange={e=>setRelieve(Number(e.target.value))}/></label>
       <DeckGL
-        views={undefined}
+        views={new MapView({ orthographic: ortografica })}
         viewState={vista}
         onViewStateChange={({ viewState }) => setVista(viewState as MapViewState)}
         controller={{ dragRotate: true, touchRotate: true, inertia: !reducirMovimiento }}
@@ -114,7 +118,9 @@ export default function Mapa3D(p: Props) {
         }}
         style={{ position: "absolute", inset: "0" }}
       />
-      <div style={{ position: "absolute", right: 12, bottom: 12, zIndex: 5, display: "flex", flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "calc(100% - 24px)", gap: 6 }} className="no-imprimir">
+      <div style={{ position: "absolute", right: 12, bottom: 12, zIndex: 5, display: "flex", flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "calc(100% - 24px)", gap: 6 }} className="no-imprimir mapa-3d-actions">
+        <button className="boton" aria-pressed={malla} onClick={()=>setMalla(!malla)}>Malla 3D</button>
+        <button className="boton" aria-pressed={ortografica} onClick={()=>setOrtografica(!ortografica)}>{ortografica?"Ortográfica":"Perspectiva"}</button>
         <button className="boton" onClick={() => inclina(12)} aria-label="Aumentar inclinación">Inclinar ▲</button>
         <button className="boton" onClick={() => inclina(-12)} aria-label="Reducir inclinación">▼</button>
         <button className="boton" onClick={() => gira(-20)} aria-label="Rotar a la izquierda">⟲</button>

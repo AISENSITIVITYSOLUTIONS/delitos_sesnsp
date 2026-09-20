@@ -1,3 +1,4 @@
+import Efectos3D from "./components/Efectos3D";
 import TerritorioImpacto from "./components/TerritorioImpacto";
 import AltoImpacto from "./components/AltoImpacto";
 import Resumen from "./components/Resumen";
@@ -154,6 +155,7 @@ export default function App() {
     <>
       <a className="visualmente-oculto" href="#contenido">Saltar al contenido</a>
       <Encabezado manifiesto={m} />
+      <Efectos3D/>
 
       <div className="filtros no-imprimir" role="region" aria-label="Filtros globales">
         <div className="contenedor">
