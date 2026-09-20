@@ -1,0 +1,79 @@
+# Circuito de actualización automática (GitHub Actions)
+# - Corre aunque nadie abra el dashboard.
+# - Calendario: diario todo el mes a las 09:10 CDMX (15:10 UTC) y cada 6 horas
+#   del día 15 al 31 (los cambios del SESNSP no siempre llegan a fin de mes;
+#   ajustar cuando se confirme el calendario oficial de publicación).
+# - Concurrencia limitada a una ejecución; reintentos limitados en descarga.
+# - Si la descarga falla o el esquema es incompatible, la última versión
+#   válida publicada se conserva (el paso de publicación no se ejecuta).
+name: actualizar-datos
+
+on:
+  schedule:
+    - cron: "10 15 * * *"        # diario 09:10 America/Mexico_City (UTC-6)
+    - cron: "10 3,9,21 15-31 * *" # refuerzo cada 6 h, días 15-31
+  workflow_dispatch: {}
+
+concurrency:
+  group: actualizacion-sesnsp
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Dependencias
+        run: pip install polars duckdb pyarrow pyyaml
+
+      - name: Restaurar estado (huellas de la última corrida)
+        uses: actions/cache@v4
+        with:
+          path: work/estado.json
+          key: estado-sesnsp-${{ github.run_id }}
+          restore-keys: estado-sesnsp-
+
+      - name: Ciclo de actualización (descarga → valida → reconstruye → publica)
+        id: ciclo
+        run: |
+          python pipeline/src/actualizar.py; rc=$?
+          # rc=0 cambios publicados o sin cambios; rc=2 fallo de consulta sin cambios; rc=1 fallo de construcción
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          if [ "$rc" = "1" ]; then exit 1; fi
+
+      - name: Pruebas del circuito (sintéticas, separadas de datos oficiales)
+        run: python pipeline/tests/test_circuito.py
+
+      - name: Construir el frontal
+        if: hashFiles('web/public/datos/manifiesto.json') != ''
+        run: |
+          cd web && npm ci && npm run build
+
+      - name: Publicar en GitHub Pages
+        if: hashFiles('web/dist/index.html') != ''
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+      - name: Desplegar
+        if: hashFiles('web/dist/index.html') != ''
+        uses: actions/deploy-pages@v4
+
+      - name: Conservar bitácora
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: historial-${{ github.run_id }}
+          path: work/historial.jsonl
+          if-no-files-found: ignore

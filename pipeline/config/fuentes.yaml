@@ -1,0 +1,44 @@
+# Fuentes oficiales — Incidencia Delictiva del Fuero Común (SESNSP / CNI-SSPC)
+# Verificadas contra el catálogo oficial:
+# https://www.gob.mx/sesnsp/acciones-y-programas/datos-abiertos-de-incidencia-delictiva
+#
+# Si un enlace cambia, localizar su reemplazo en el catálogo oficial y verificar
+# que corresponda al MISMO producto estadístico antes de sustituirlo aquí.
+
+catalogo_oficial: "https://www.gob.mx/sesnsp/acciones-y-programas/datos-abiertos-de-incidencia-delictiva?state=published"
+metodologia: "https://www.gob.mx/sesnsp/articulos/nueva-metodologia-para-el-registro-y-clasificacion-de-los-delitos-y-las-victimas-para-fines-estadisticos"
+manuales: "https://www.gob.mx/sesnsp/documentos/documentos-y-manuales-sobre-incidencia-delictiva?state=published"
+
+fuentes:
+  estatal_2015_2025:
+    descripcion: "Cifras de Incidencia Delictiva Estatal, 2015 - 2025 (nueva metodología, instrumento de 53 delitos)"
+    nivel: estatal
+    periodo: "2015-01 .. 2025-12"
+    metodologia_registro: "NM-2015"   # instrumento vigente ene-2015 a dic-2025
+    url: "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQDbKVoKKhp4SrgMtPRM-FILARntV1yA0s8T7nu84A_HF70?e=tZc3uw"
+  municipal_2015_2025:
+    descripcion: "Cifras de Incidencia Delictiva Municipal, 2015 - 2025 (nueva metodología, instrumento de 53 delitos)"
+    nivel: municipal
+    periodo: "2015-01 .. 2025-12"
+    metodologia_registro: "NM-2015"
+    url: "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQCIHz1ZZoXjRZ3IySsQQqgFAYKdzEOXXK1YXfhhEhyDMcs?e=PsagaS"
+  estatal_2026:
+    descripcion: "Cifras de Incidencia Delictiva Estatal 2026 (registro vigente desde enero de 2026, instrumento de 71 delitos)"
+    nivel: estatal
+    periodo: "2026-01 .. corte"
+    metodologia_registro: "NR-2026"
+    url: "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQBBP0Bh8YBEQpdct54JoLbkAfsR_nJJ5RJa03UwlgRmA2E?e=Gca5VL"
+  municipal_2026:
+    descripcion: "Cifras de Incidencia Delictiva Municipal 2026 (registro vigente desde enero de 2026, instrumento de 71 delitos)"
+    nivel: municipal
+    periodo: "2026-01 .. corte"
+    metodologia_registro: "NR-2026"
+    url: "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQAUYyl5NobOT4SHGj0O54aJATRtcR7qsQmNHWj_EOOzP-M?e=Eb940N"
+
+descarga:
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36"
+  reintentos: 3
+  espera_entre_reintentos_s: 30
+  timeout_s: 900
+  # SharePoint: agregar download=1 para descarga directa del binario
+  parametro_descarga_directa: "download=1"

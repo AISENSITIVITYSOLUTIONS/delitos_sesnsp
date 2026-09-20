@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+.venv/
+
+# Node / Vite
+node_modules/
+web/dist/
+
+# Datos crudos y artefactos generados (se recrean en CI)
+raw/
+work/
+logs/
+
+# Entorno Python pipeline
+pipeline/venv/
+
+# Logs de sesión
+*.log
