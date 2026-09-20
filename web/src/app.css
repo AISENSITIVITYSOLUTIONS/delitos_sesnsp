@@ -223,3 +223,38 @@ dialog.calculo::backdrop { background: rgba(11, 21, 32, 0.5); backdrop-filter: b
 .spark path.linea { fill: none; stroke: var(--marino); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .spark path.area { fill: var(--marino); opacity: 0.10; stroke: none; }
 .spark circle { fill: var(--marino); stroke: var(--surface); stroke-width: 2; }
+
+/* Navegación lateral y paneles de la propuesta grafito/azul. */
+.encabezado { border-image: linear-gradient(90deg,#007bff,#36b9ff,transparent) 1; }
+.encabezado__sello { color:#38adff; background:rgba(0,123,255,.14); border-color:rgba(56,173,255,.3); }
+.encabezado__titulo { font-family:var(--sans); letter-spacing:-.025em; }
+.encabezado__nav a:hover, .encabezado__nav a:focus-visible { background:#006bc7; color:#fff; border-color:#38adff; }
+.hallazgo::before { background:linear-gradient(#008cff,#60c2ff); }
+.hallazgo__cifra { font-variant-numeric:tabular-nums; }
+.tab-delito[aria-selected="true"] { background:#006bc7; color:#fff; border-color:#249aff; }
+.seccion__num { color:var(--acento); }
+.sidebar-brand, .sidebar-caption { display:none; }
+@media (min-width:1200px) {
+  body { padding-left:224px; }
+  .contenedor { max-width:1600px; padding-left:24px; padding-right:24px; }
+  .encabezado__nav {
+    position:fixed; inset:0 auto 0 0; width:224px; z-index:45;
+    background:linear-gradient(180deg,#101e29,#0b141c);
+    border-right:1px solid #2b4052; border-top:0;
+    display:flex; flex-direction:column; padding:28px 14px;
+  }
+  .encabezado__nav .contenedor { display:flex; flex-direction:column; padding:0; margin:0; overflow:visible; gap:10px; }
+  .encabezado__nav a { padding:13px 12px; border-radius:7px; white-space:normal; border-bottom:0; }
+  .sidebar-brand { display:flex; gap:12px; align-items:center; margin-bottom:40px; color:#edf5ff; font-size:12px; line-height:1.5; letter-spacing:.05em; font-weight:600; }
+  .sidebar-brand span { width:42px; height:42px; flex-shrink:0; border:7px solid #078cff; border-right-color:#63c3ff; border-radius:50%; box-shadow:0 0 22px #007bff33; }
+  .sidebar-brand small { display:block; color:#38adff; margin-top:4px; }
+  .sidebar-caption { display:block; margin-top:auto; padding:24px 12px 4px; color:#a8c4df; font-size:11px; line-height:1.8; letter-spacing:.14em; text-transform:uppercase; }
+  .encabezado__inner { padding-top:24px; padding-bottom:24px; }
+}
+@media (max-width:759px) {
+  .encabezado__inner { gap:16px; }
+  .estado-lista { gap:10px; padding:10px; }
+  .encabezado__estado { width:100%; }
+  .filtros { position:relative; }
+  .hallazgos-grid { grid-template-columns:1fr; }
+}

@@ -102,6 +102,7 @@ export function alternarTema(): void {
 }
 
 export function iniciarTema(): void {
+  document.documentElement.setAttribute("data-theme", "dark");
   try {
     const t = localStorage.getItem("tema");
     if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);

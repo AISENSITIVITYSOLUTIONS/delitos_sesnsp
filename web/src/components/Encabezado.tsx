@@ -48,6 +48,7 @@ export default function Encabezado({ manifiesto }: { manifiesto: Manifiesto | nu
         </div>
       </div>
       <nav className="encabezado__nav no-imprimir" aria-label="Secciones">
+        <div className="sidebar-brand"><span aria-hidden="true" /><div>OBSERVATORIO<br />DE INCIDENCIA DELICTIVA<small>MÉXICO</small></div></div>
         <div className="contenedor">
           <a href="#hallazgos">Hallazgos</a>
           <a href="#delitos">Delitos de mayor incidencia</a>
@@ -55,6 +56,7 @@ export default function Encabezado({ manifiesto }: { manifiesto: Manifiesto | nu
           <a href="#explorador">Explorador territorial</a>
           <a href="#metodologia">Metodología y fuentes</a>
         </div>
+        <p className="sidebar-caption">Datos para comprender<br />el territorio y la seguridad</p>
       </nav>
     </header>
   );

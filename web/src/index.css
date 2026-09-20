@@ -18,7 +18,7 @@
   --ink: #14212E;
   --ink-2: #4E5A66;
   --ink-3: #8A8B86;
-  --ink-inv: #F2EFE7;
+  --ink-inv: #edf5ff;
   --grid: #E5E1D6;
   --axis: #C9C4B6;
   --border: rgba(20, 33, 46, 0.10);
@@ -48,24 +48,24 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --page: #0B1520;
-    --surface: #12202E;
-    --surface-2: #162636;
-    --header: #0B1520;
-    --header-2: #12202E;
-    --ink: #F2EFE7;
-    --ink-2: #A8B4BE;
-    --ink-3: #7C8894;
+    --page: #0b141c;
+    --surface: #172630;
+    --surface-2: #1b2e3c;
+    --header: #0b141c;
+    --header-2: #172630;
+    --ink: #edf5ff;
+    --ink-2: #b7cbe0;
+    --ink-3: #94adc4;
     --ink-inv: #14212E;
-    --grid: #22303E;
-    --axis: #33424F;
+    --grid: #243746;
+    --axis: #3b5267;
     --border: rgba(242, 239, 231, 0.10);
     --border-strong: rgba(242, 239, 231, 0.18);
-    --s1: #437dbc; --s2: #b27e17; --s3: #128e78; --s4: #7f63ae; --s5: #bc5840;
+    --s1: #169bff; --s2: #b27e17; --s3: #128e78; --s4: #7f63ae; --s5: #bc5840;
     --deemphasis: #3A4854;
-    --marino: #437dbc;
+    --marino: #169bff;
     --petroleo: #128e78;
-    --acento: #6ea3d8;
+    --acento: #63bbff;
     --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.3);
     --sombra-2: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
     --sombra-3: 0 4px 12px rgba(0, 0, 0, 0.35), 0 16px 40px rgba(0, 0, 0, 0.45);
@@ -73,24 +73,24 @@
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --page: #0B1520;
-  --surface: #12202E;
-  --surface-2: #162636;
-  --header: #0B1520;
-  --header-2: #12202E;
-  --ink: #F2EFE7;
-  --ink-2: #A8B4BE;
-  --ink-3: #7C8894;
+  --page: #0b141c;
+  --surface: #172630;
+  --surface-2: #1b2e3c;
+  --header: #0b141c;
+  --header-2: #172630;
+  --ink: #edf5ff;
+  --ink-2: #b7cbe0;
+  --ink-3: #94adc4;
   --ink-inv: #14212E;
-  --grid: #22303E;
-  --axis: #33424F;
+  --grid: #243746;
+  --axis: #3b5267;
   --border: rgba(242, 239, 231, 0.10);
   --border-strong: rgba(242, 239, 231, 0.18);
-  --s1: #437dbc; --s2: #b27e17; --s3: #128e78; --s4: #7f63ae; --s5: #bc5840;
+  --s1: #169bff; --s2: #b27e17; --s3: #128e78; --s4: #7f63ae; --s5: #bc5840;
   --deemphasis: #3A4854;
-  --marino: #437dbc;
+  --marino: #169bff;
   --petroleo: #128e78;
-  --acento: #6ea3d8;
+  --acento: #63bbff;
   --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.3);
   --sombra-2: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
   --sombra-3: 0 4px 12px rgba(0, 0, 0, 0.35), 0 16px 40px rgba(0, 0, 0, 0.45);
@@ -186,7 +186,7 @@ select.control, input.control {
 }
 .boton:hover { box-shadow: var(--sombra-1); background: var(--surface-2); }
 .boton--primario {
-  background: var(--header); color: #F2EFE7; border-color: transparent;
+  background: var(--header); color: #edf5ff; border-color: transparent;
 }
 .boton--primario:hover { background: var(--header-2); }
 
@@ -228,4 +228,22 @@ table.datos tr:hover td { background: var(--surface-2); }
 @media print {
   body { background: #fff; }
   .no-imprimir { display: none !important; }
+}
+
+/* Grafito y azul eléctrico: identidad visual del observatorio. */
+h1, h2 { font-family: var(--sans); }
+:root[data-theme="dark"] { --acento: #63bbff; --radio: 10px; }
+html { scroll-padding-top: 110px; }
+.tarjeta { box-shadow: inset 0 1px 0 rgba(255,255,255,.035), var(--sombra-1); }
+:root[data-theme="dark"] .tarjeta { background: linear-gradient(135deg,#1b2c38,#14222d); }
+.boton--primario, .seg button[aria-pressed="true"] {
+  background: #006bc7; color: #fff; border-color: #208ced;
+}
+.boton--primario:hover { background: #005bab; }
+table.datos tbody tr:nth-child(even) { background: var(--surface-2); }
+.visualmente-oculto:focus { position: fixed; top: 8px; left: 8px; width: auto; height: auto; clip: auto; padding: 12px; background: var(--surface); z-index: 100; }
+@media print {
+  :root { --page:#fff; --surface:#fff; --surface-2:#f1f3f5; --ink:#14212e; --ink-2:#344658; --ink-3:#445668; }
+  body { padding-left:0 !important; }
+  .tarjeta { background:#fff !important; box-shadow:none; }
 }

@@ -1,20 +1,10 @@
-/**
- * Instancia de paleta del proyecto (método dataviz, validada con
- * scripts/validate_palette.js del skill: seis verificaciones, ambos modos).
- *
- * Resultados de validación (2026-09-19):
- *  - Categórica LIGHT sobre #FBF9F4: todas las verificaciones PASS,
- *    peor par adyacente CVD ΔE 10.7 (objetivo ≥8), visión normal ≥15. Sin WARN.
- *  - Categórica DARK  sobre #12202E: todas PASS, peor par CVD ΔE 10.2. Sin WARN.
- * Orden de ranuras FIJO (mecanismo de seguridad CVD): azul → ocre → petróleo →
- * púrpura → terracota. El color sigue a la entidad, nunca a su rango.
- * Formas de todos-los-pares (dispersión, coropletas categóricas, múltiplos
- * pequeños): máximo 3 ranuras; más series se pliegan a "Otros" o se facetan.
+/** Paleta grafito y azul eléctrico.
+ * Categorías con ranuras fijas; variaciones conservan su escala divergente.
+ * La nueva rampa secuencial requiere una auditoría perceptual independiente.
  */
-
 export const SUPERFICIE = {
   light: { chart: "#FBF9F4", page: "#F4F0E8" },
-  dark: { chart: "#12202E", page: "#0B1520" },
+  dark: { chart: "#172630", page: "#0b141c" },
 } as const;
 
 export const TINTA = {
@@ -39,15 +29,13 @@ export const TINTA = {
 /** Ranuras categóricas: orden fijo, nunca cicladas. */
 export const CATEGORICA = {
   light: ["#1e5a96", "#b5811c", "#00816c", "#6e529a", "#b24f37"],
-  dark: ["#437dbc", "#b27e17", "#128e78", "#7f63ae", "#bc5840"],
+  dark: ["#169bff", "#b27e17", "#128e78", "#7f63ae", "#bc5840"],
 } as const;
 
-/** Secuencial (magnitud): rampa análoga petróleo→azul marino (vecinos fríos,
- * excepción análoga documentada del método; luminosidad monótona verificada
- * 0.92→0.34). Claro→oscuro en modo claro; ancla invertida en modo oscuro. */
+/** Secuencial: magnitud en azul. Los valores altos son más claros en modo oscuro. */
 export const SECUENCIAL = {
   light: ["#d0ece7", "#a1d6d6", "#72bcc6", "#3e9db6", "#047ca6", "#005a8c", "#00386a"],
-  dark: ["#0c2f52", "#00466f", "#006082", "#007f99", "#339ca9", "#6bb7b8", "#9cd0cb"],
+  dark: ["#12375b", "#14518a", "#176bc0", "#168bea", "#43a6f5", "#80c4fa", "#b8dfff"],
 } as const;
 
 /** Divergente (polaridad de variaciones): petróleo ↔ terracota con punto medio
