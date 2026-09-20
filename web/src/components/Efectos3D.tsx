@@ -6,7 +6,7 @@ export default function Efectos3D(){
  const [reducido,setReducido]=useState(()=>matchMedia('(prefers-reduced-motion:reduce)').matches);
  useEffect(()=>{const q=matchMedia('(prefers-reduced-motion:reduce)'),fn=()=>setReducido(q.matches);q.addEventListener('change',fn);return()=>q.removeEventListener('change',fn);},[]);
  useEffect(()=>{
-  const root=document.documentElement;root.dataset.efectos=reducido?'apagado':modo;
+  const root=document.documentElement;root.dataset.efectos=modo;
   try{localStorage.setItem('ni-efectos',modo);}catch{/* optional */}
   const visibility=()=>{root.dataset.fxPaused=document.hidden?'true':'false';};visibility();document.addEventListener('visibilitychange',visibility);
   let active:HTMLElement|null=null,frame=0;let x=0,y=0;
