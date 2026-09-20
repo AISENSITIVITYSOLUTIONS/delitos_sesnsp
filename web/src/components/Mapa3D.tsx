@@ -65,7 +65,7 @@ export default function Mapa3D(p: Props) {
   const inicial = useMemo(() => vistaInicial(p.territorios), [p.territorios]);
   const [vista, setVista] = useState<MapViewState>(inicial);
   useEffect(() => { setVista(inicial); }, [inicial]);
-  const reducirMovimiento = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reducirMovimiento = document.documentElement.dataset.efectos === "apagado" || matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const datos = useMemo(() => p.territorios.map(t => {
     const d = p.valores[t.cve];
@@ -131,6 +131,8 @@ export default function Mapa3D(p: Props) {
         style={{ position: "absolute", inset: "0" }}
       />
       <div style={{ position: "absolute", right: 12, bottom: 12, zIndex: 5, display: "flex", flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "calc(100% - 24px)", gap: 6 }} className="no-imprimir mapa-3d-actions">
+        <button className="boton" aria-label="Acercar mapa" onClick={()=>setVista(v=>({...v,zoom:Math.min(12,v.zoom+0.5)}))}>＋</button>
+        <button className="boton" aria-label="Alejar mapa" onClick={()=>setVista(v=>({...v,zoom:Math.max(2,v.zoom-0.5)}))}>−</button>
         <button className="boton" aria-pressed={malla} onClick={()=>setMalla(!malla)}>Malla 3D</button>
         <button className="boton" aria-pressed={ortografica} onClick={()=>setOrtografica(!ortografica)}>{ortografica?"Ortográfica":"Perspectiva"}</button>
         <button className="boton" onClick={() => inclina(12)} aria-label="Aumentar inclinación">Inclinar ▲</button>

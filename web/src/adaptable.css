@@ -20,3 +20,25 @@ h1,h2,h3,h4,p,dd,output,.nota{overflow-wrap:anywhere}
 @media(max-width:380px){.impacto-tabs{grid-template-columns:1fr}.fx-toolbar{padding:10px}.fx-toolbar button{font-size:12px}.encabezado__sello{display:none}.impacto-kpis strong{font-size:28px}.mapa-consulta{padding:8px}}
 @media(max-height:500px) and (orientation:landscape){.encabezado__nav.menu-abierto{max-height:60dvh}.filtros{position:relative!important}dialog{max-height:80dvh}}
 @media print{.mapa-consulta{display:none}.mapa-3d-escena{break-inside:avoid}}
+/* Revisión posterior a Grafito y zafiro. Sin ocultar el desbordamiento global. */
+.filtros label,.fila label,.calculo__head>*{min-width:0;max-width:100%}
+.impacto-badge{white-space:normal;overflow-wrap:anywhere}
+.mapa-leyenda .escala{width:100%;max-width:180px}
+.mapa-leyenda .extremos{gap:12px;flex-wrap:wrap}
+.mapa-leyenda .extremos>*{min-width:0;overflow-wrap:anywhere}
+.mapa-consulta output,.cambio{overflow-wrap:anywhere}
+.municipio-enlace{font:inherit;text-align:left;max-width:100%}
+input[type=checkbox],input[type=radio]{min-width:24px;min-height:24px}
+label:has(input[type=checkbox]),label:has(input[type=radio]){min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:6px}
+.calculo__head{flex-wrap:wrap}.calculo pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:700px){
+ .impacto-kpis article{padding:16px}.impacto-kpis article>strong{font-size:clamp(24px,7vw,36px)}
+ .fx-toolbar>div{flex-wrap:wrap}.fx-toolbar button{flex:1 1 80px}
+ .fila{flex-wrap:wrap}.fila>label{flex:1 1 160px}
+ .encabezado__estado{flex-wrap:wrap}.estado-lista{width:100%}
+ .mapa-relieve{bottom:190px!important;right:12px;max-width:calc(100% - 24px)}
+ .mapa-3d-escena{height:560px!important}.mapa-3d-actions{grid-template-columns:repeat(3,minmax(44px,1fr))}
+ .impacto-tabla,.tabla-scroll{touch-action:pan-x pan-y}
+ .seccion__desc,.nota,.mapa-consulta output{font-size:13px}
+}
+@media(pointer:coarse){.tarjeta--alzable:hover{transform:none}.fx-active{transform:none!important}}

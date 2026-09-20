@@ -172,7 +172,7 @@ export default function RankingMunicipios({ ranking, municipal, periodoClave, on
                 <tr key={m.cve} style={{ cursor: "pointer" }} onClick={() => onVerMunicipio(m.cve)}
                   title="Ver en el explorador territorial">
                   <td style={{ fontFamily: "var(--mono)", fontSize: 12 }}>{m.cve}</td>
-                  <td>{m.nombre}</td><td>{m.entidad}</td>
+                  <td><button className="boton municipio-enlace" onClick={e=>{e.stopPropagation();onVerMunicipio(m.cve);}} aria-label={`Explorar ${m.nombre}`}>{m.nombre}</button></td><td>{m.entidad}</td>
                   <td className="num">{fEntero(m.total)}</td>
                   <td className="num">{m.ultimo == null ? "no publicado" : fEntero(m.ultimo)}</td>
                 </tr>
