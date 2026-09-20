@@ -1,3 +1,4 @@
+import TerritorioImpacto from "./components/TerritorioImpacto";
 import AltoImpacto from "./components/AltoImpacto";
 import Resumen from "./components/Resumen";
 import { useEffect, useMemo, useState } from "react";
@@ -182,6 +183,7 @@ export default function App() {
 
       <main id="contenido" className="contenedor">
         <AltoImpacto nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} />
+        <TerritorioImpacto estatal={datos.estatal} sn={datos.nacionalNM} pob={datos.pob}/>
         <section className="seccion" id="hallazgos" aria-labelledby="t-hallazgos">
           <div className="seccion__head">
             <span className="seccion__num">01</span>

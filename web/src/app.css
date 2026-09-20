@@ -373,3 +373,11 @@ dialog.calculo::backdrop { background: rgba(11, 21, 32, 0.5); backdrop-filter: b
 @media(max-width:1100px) { .impacto-controles { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:650px) { .impacto-kpis,.impacto-controles { grid-template-columns:1fr; } .impacto-hero { flex-direction:column; align-items:flex-start; padding:20px; } .impacto-panel { padding:16px; } .impacto-tabs button { flex:1 1 140px; } }
 @media(prefers-reduced-motion:reduce) { .impacto * { transition:none!important; animation:none!important; } }
+/* Comparadores: compensar la barra fija y conservar legibilidad en impresión. */
+.impacto, #territorio-impacto { scroll-margin-top:140px; }
+.persistencia { margin:20px 0; padding:18px 0; border-bottom:1px solid var(--border); }
+.persistencia .impacto-kpis { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.impacto-tabla tbody th { position:static; font-weight:500; }
+@media(max-width:1000px) { .persistencia .impacto-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) { .persistencia .impacto-kpis { grid-template-columns:1fr; } }
+@media print { .impacto-tabla { max-height:none; overflow:visible; } .impacto-kpis article { transform:none!important; box-shadow:none; } }

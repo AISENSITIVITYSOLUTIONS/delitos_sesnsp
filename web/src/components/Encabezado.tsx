@@ -54,6 +54,7 @@ export default function Encabezado({ manifiesto }: { manifiesto: Manifiesto | nu
         <div className="sidebar-brand"><span aria-hidden="true" /><div>OBSERVATORIO<br />DE INCIDENCIA DELICTIVA<small>MÉXICO</small></div></div>
         <div className="contenedor">
           <a href="#alto-impacto">◈ Alto impacto · NI</a>
+          <a href="#territorio-impacto">◇ Cambio territorial</a>
           <a href="#hallazgos">⌂ Inicio y hallazgos</a>
           <a href="#resumen">▤ Resumen gráfico</a>
           <a href="#delitos">Delitos de mayor incidencia</a>

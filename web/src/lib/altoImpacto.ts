@@ -16,3 +16,23 @@ export function medida(v:number|null,mes:string,modo:string,poblacion:Record<str
   if(modo==='tasa'){const p=poblacion[mes.slice(0,4)];return p>0?v/p*100000:null;}
   return v;
 }
+
+/** Ventanas completas: un faltante invalida el agregado; los ceros sí cuentan. */
+export function desplazarMes(mes:string,delta:number):string {
+ const [y,m]=mes.split('-').map(Number),d=new Date(Date.UTC(y,m-1+delta,1));
+ return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}`;
+}
+export function ventana(sn:SeriesNacionales,id:string,fin:string,n:number):number|null {
+ if(!Number.isInteger(n)||n<1)return null;
+ const vs=Array.from({length:n},(_,i)=>valorMes(sn,id,desplazarMes(fin,i-n+1)));
+ return vs.some(v=>v==null)?null:vs.reduce<number>((a,v)=>a+v!,0);
+}
+export function resumenTemporal(sn:SeriesNacionales,id:string,fin:string){
+ const previo=desplazarMes(fin,-12), n=Number(fin.slice(5));
+ return [
+  {titulo:'Mismo mes del año anterior',actual:valorMes(sn,id,fin),base:valorMes(sn,id,previo),periodo:`${fin} frente a ${previo}`},
+  {titulo:'Acumulado del año',actual:ventana(sn,id,fin,n),base:ventana(sn,id,previo,n),periodo:`${fin.slice(0,4)}-01–${fin} frente a ${previo.slice(0,4)}-01–${previo}`},
+  {titulo:'Últimos tres meses',actual:ventana(sn,id,fin,3),base:ventana(sn,id,previo,3),periodo:`${desplazarMes(fin,-2)}–${fin} frente a ${desplazarMes(previo,-2)}–${previo}`},
+  {titulo:'Doce meses móviles',actual:ventana(sn,id,fin,12),base:ventana(sn,id,previo,12),periodo:`${desplazarMes(fin,-11)}–${fin} frente a ${desplazarMes(previo,-11)}–${previo}`},
+ ].map(d=>({...d,cambio:cambio(d.actual,d.base)}));
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "prensa-2026-05-12-homicidio",
+    "fecha": "2026-05-12",
+    "resumen": "El País reporta un anuncio de reducción de 40 % en el promedio diario de homicidios, entre septiembre de 2024 y abril de 2026.",
+    "fuente": "https://elpais.com/mexico/2026-05-12/el-gobierno-presume-de-que-los-homicidios-van-a-la-baja-en-todo-el-pais.html",
+    "tipoFuente": "Secundaria · cobertura periodística",
+    "fuentePrimaria": null,
+    "baseReportada": 86.9,
+    "actualReportado": 52.5,
+    "variacionAnunciada": -40,
+    "estado": "Evidencia insuficiente para verificación integral",
+    "limite": "La nota mezcla signos porcentuales con promedios diarios. Se necesita el documento oficial para confirmar unidades, cifras y método.",
+    "consulta": "2026-09-20"
+  }
+]

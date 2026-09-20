@@ -17,3 +17,12 @@ test('corte y ausencias se conservan aunque el archivo contenga ceros futuros',(
  assert.equal(valorMes(s,'x','2026-01'),0);assert.equal(valorMes(s,'x','2026-02'),null);
  assert.equal(valorMes(s,'x','2026-03'),null);assert.equal(valorMes(s,'y','2026-01'),null);
 });
+
+test('ventanas consecutivas no convierten meses ausentes en cero',async()=>{
+ const { ventana,desplazarMes,resumenTemporal }=await import('../src/lib/altoImpacto.ts');
+ assert.equal(desplazarMes('2024-01',-1),'2023-12');
+ const s={meta:{corte:'2026-03'},meses:['2026-01','2026-02','2026-03'],series:{x:[10,0,20]}};
+ assert.equal(ventana(s,'x','2026-03',3),30);assert.equal(ventana(s,'x','2026-03',12),null);
+ assert.ok(resumenTemporal(s,'x','2026-03').every(x=>x.cambio===null));
+ s.series.x[1]=null;assert.equal(ventana(s,'x','2026-03',3),null);
+});

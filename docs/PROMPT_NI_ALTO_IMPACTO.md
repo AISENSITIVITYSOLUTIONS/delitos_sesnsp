@@ -121,3 +121,7 @@ Entrega código, pruebas, diccionario, fuentes versionadas, registro de cambios,
 Laboratorio nacional con selección editorial separada por instrumento, cálculo mensual en registros/promedio diario/tasa, comparación entre meses, sensibilidad al mismo mes de años anteriores, tabla de categorías y exportación de serie. Protocolo público de verificación y referencias externas con estado pendiente. Superficies con profundidad y mapa con iluminación mejorada.
 
 Pendiente de nuevas fuentes y desarrollo: registro poblado de declaraciones verificadas, víctimas, triangulación numérica INEGI/encuestas, descomposición territorial específica de alto impacto, modelos causales y todas las pruebas físicas de dispositivos. No presentar el laboratorio inicial como la implementación completa de esta especificación.
+
+### Actualización de implementación
+
+La ampliación posterior incorpora ventanas completas, modalidades de robo, contribuciones estatales conciliadas, indicadores ENVIPE de contexto y un expediente de declaraciones con fuente secundaria explícita. El alcance actual y los bloqueos de fuentes se detallan en `ALTO_IMPACTO_ESTADO.md`; esta nota sustituye el inventario inicial de pendientes cuando exista diferencia.

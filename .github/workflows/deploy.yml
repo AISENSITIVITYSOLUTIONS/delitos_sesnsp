@@ -37,6 +37,10 @@ jobs:
         working-directory: web
         run: npm ci
 
+      - name: Verificar comparabilidad y conciliación
+        working-directory: web
+        run: node --test tests/*.test.mjs
+
       - name: Compilar el dashboard
         working-directory: web
         run: npm run build -- --base=/

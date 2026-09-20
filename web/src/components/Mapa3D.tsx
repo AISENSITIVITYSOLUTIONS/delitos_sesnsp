@@ -48,6 +48,7 @@ export default function Mapa3D(p: Props) {
     principal: new DirectionalLight({ color: [255, 255, 255], intensity: 1.8, direction: [-2, -3, -4] }),
     relleno: new DirectionalLight({ color: [80, 170, 255], intensity: 0.6, direction: [3, 1, -2] }),
   })], []);
+  const [relieve, setRelieve] = useState(1);
   const inicial = useMemo(() => vistaInicial(p.territorios), [p.territorios]);
   const [vista, setVista] = useState<MapViewState>(inicial);
   useEffect(() => { setVista(inicial); }, [inicial]);
@@ -58,7 +59,7 @@ export default function Mapa3D(p: Props) {
     return { ...t, valor: d?.v ?? null };
   }), [p.territorios, p.valores]);
 
-  const escalaAltura = p.maxV > 0 ? 320_000 / p.maxV : 0;
+  const escalaAltura = p.maxV > 0 ? 320_000 * relieve / p.maxV : 0;
 
   const capa = useMemo(() => new PolygonLayer({
     id: "territorios-3d",
@@ -97,6 +98,7 @@ export default function Mapa3D(p: Props) {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "clamp(360px, 55vw, 560px)" }}>
+      <label className="mapa-relieve no-imprimir" style={{position:"absolute",left:12,bottom:64,zIndex:5,background:"var(--surface)",padding:8,borderRadius:8}}>Relieve visual <input aria-label="Intensidad del relieve 3D" type="range" min="0" max="1" step="0.1" value={relieve} onChange={e=>setRelieve(Number(e.target.value))}/></label>
       <DeckGL
         views={undefined}
         viewState={vista}
@@ -120,7 +122,7 @@ export default function Mapa3D(p: Props) {
         <button className="boton" onClick={() => setVista(inicial)} aria-label="Restablecer vista">Restablecer</button>
       </div>
       <p className="nota" style={{ position: "absolute", left: 12, top: 12, zIndex: 5, maxWidth: 240 }}>
-        La <strong>altura</strong> representa {p.metrica === "conteo" ? "el número de delitos registrados" : "la tasa por 100 mil habitantes"} del periodo mostrado (escala lineal desde cero).
+        La <strong>altura</strong> representa {p.metrica === "conteo" ? "el número de delitos registrados" : "la tasa por 100 mil habitantes"} del periodo mostrado (escala lineal desde cero). Máximo visible: {p.fmt(p.maxV)}. El control de relieve modifica la representación, no los valores.
       </p>
     </div>
   );
