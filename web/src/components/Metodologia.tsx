@@ -22,7 +22,7 @@ export default function Metodologia({ manifiesto, correspondencias }: Props) {
             (cifra negra) y su magnitud varía por delito y territorio.
           </p>
           <p style={{ marginTop: 8 }}><strong>Archivos fuente verificados en la última actualización:</strong></p>
-          <table className="datos" style={{ marginTop: 6 }}>
+          <div className="tabla-scroll" role="region" aria-label="Archivos fuente" tabIndex={0}><table className="datos" style={{ marginTop: 6 }}>
             <thead><tr><th>Fuente</th><th>SHA-256</th><th className="num">Bytes</th><th>Descargada</th></tr></thead>
             <tbody>
               {manifiesto.fuentes.map(f => (
@@ -34,7 +34,7 @@ export default function Metodologia({ manifiesto, correspondencias }: Props) {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       </details>
 
@@ -112,14 +112,14 @@ export default function Metodologia({ manifiesto, correspondencias }: Props) {
         <summary>Historial de actualizaciones</summary>
         <div className="bloque__cuerpo">
           {manifiesto.cambios.length === 0 ? <p className="nota">Sin eventos registrados aún.</p> : (
-            <table className="datos">
+            <div className="tabla-scroll" role="region" aria-label="Historial de actualizaciones" tabIndex={0}><table className="datos">
               <thead><tr><th>Fecha</th><th>Evento</th><th>Detalle</th></tr></thead>
               <tbody>
                 {manifiesto.cambios.slice(0, 30).map((c, i) => (
                   <tr key={i}><td>{fFechaHora(c.ts)}</td><td><span className="chip">{c.evento}</span></td><td className="nota">{c.detalle}</td></tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           )}
         </div>
       </details>

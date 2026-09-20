@@ -42,3 +42,6 @@ label:has(input[type=checkbox]),label:has(input[type=radio]){min-height:44px;dis
  .seccion__desc,.nota,.mapa-consulta output{font-size:13px}
 }
 @media(pointer:coarse){.tarjeta--alzable:hover{transform:none}.fx-active{transform:none!important}}
+.metodologia{grid-template-columns:minmax(0,1fr)}
+.metodologia details,.bloque__cuerpo{min-width:0;max-width:100%}
+details.bloque summary{overflow-wrap:anywhere}
