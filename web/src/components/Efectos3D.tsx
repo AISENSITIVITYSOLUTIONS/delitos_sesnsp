@@ -12,7 +12,7 @@ export default function Efectos3D(){
   let active:HTMLElement|null=null,frame=0;let x=0,y=0;
   const clear=()=>{if(active){for(const k of ['--rx','--ry','--mx','--my'])active.style.removeProperty(k);active.classList.remove('fx-active');active=null;}cancelAnimationFrame(frame);frame=0;};
   const move=(e:PointerEvent)=>{
-   if(reducido||modo!=='cinematico'||e.pointerType!=='mouse')return;
+   if(modo!=='cinematico'||e.pointerType!=='mouse')return;
    const el=(e.target as HTMLElement).closest<HTMLElement>(targets);
    if(!el||el.querySelector('dialog[open],canvas,svg')){clear();return;}
    if(el!==active){clear();active=el;el.classList.add('fx-active');}
@@ -25,5 +25,5 @@ export default function Efectos3D(){
   const mutation=new MutationObserver(discover);mutation.observe(document.getElementById('root')!,{childList:true,subtree:true});
   return()=>{clear();observer.disconnect();mutation.disconnect();document.removeEventListener('pointermove',move);document.removeEventListener('pointerleave',clear);document.removeEventListener('visibilitychange',visibility);window.removeEventListener('blur',clear);window.removeEventListener('scroll',clear);};
  },[modo,reducido]);
- return <aside className="fx-toolbar no-imprimir" aria-label="Efectos visuales"><span className="fx-diamond" aria-hidden="true">◈</span><strong>Experiencia 3D</strong><div role="group" aria-label="Intensidad de efectos">{(['cinematico','suave','apagado'] as Modo[]).map(m=><button key={m} aria-pressed={modo===m} onClick={()=>setModo(m)}>{m==='cinematico'?'Cinemático':m==='suave'?'Suave':'Sin efectos'}</button>)}</div><small>{reducido?'Movimiento reducido del dispositivo activo':modo==='cinematico'?'Perspectiva · reflejos · profundidad':modo==='suave'?'Iluminación estática y movimiento ligero':'Visualización estática'}</small></aside>;
+ return <aside className="fx-toolbar no-imprimir" aria-label="Efectos visuales"><span className="fx-diamond" aria-hidden="true">◈</span><strong>Experiencia 3D</strong><div role="group" aria-label="Intensidad de efectos">{(['cinematico','suave','apagado'] as Modo[]).map(m=><button key={m} aria-pressed={modo===m} onClick={()=>setModo(m)}>{m==='cinematico'?'Cinemático':m==='suave'?'Suave':'Sin efectos'}</button>)}</div><small>{modo==='cinematico'?'Perspectiva · reflejos · profundidad':reducido?'Movimiento reducido del dispositivo activo':modo==='suave'?'Iluminación estática y movimiento ligero':'Visualización estática'}</small></aside>;
 }
