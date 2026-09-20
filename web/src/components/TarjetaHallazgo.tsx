@@ -46,10 +46,13 @@ export default function TarjetaHallazgo({ t }: { t: TH }) {
       <p className="hallazgo__cifra">{t.cifra} <small>{t.unidad}</small></p>
       <p className="hallazgo__periodo">{t.periodo}</p>
       <p className={`hallazgo__comp ${esBaja ? "hallazgo__comp--baja" : "hallazgo__comp--alza"}`}>{t.comparacion}</p>
-      <Spark etiquetas={t.mini.etiquetas} valores={t.mini.valores} />
-      <p className="hallazgo__interpretacion">{t.interpretacion}</p>
+      <details className="hallazgo-detalle"><summary>Interpretación y tendencia</summary>
+        <Spark etiquetas={t.mini.etiquetas} valores={t.mini.valores} />
+        <p className="hallazgo__interpretacion">{t.interpretacion}</p>
+        <p className="nota">{validezTxt}</p>
+      </details>
       <div className="hallazgo__pie">
-        <span className="hallazgo__validez">{validezTxt}</span>
+        
         <button className="ver-calculo" onClick={() => ref.current?.showModal()}>Ver cálculo</button>
       </div>
       <dialog ref={ref} className="calculo" aria-label={`Cálculo de: ${t.titulo}`}>

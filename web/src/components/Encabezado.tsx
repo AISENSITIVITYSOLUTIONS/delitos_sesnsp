@@ -1,8 +1,10 @@
+import { useState } from "react";
 import type { Manifiesto } from "../lib/contratos";
 import { fFechaHora, fMesLargo } from "../lib/formato";
 import { alternarTema } from "../lib/estado";
 
 export default function Encabezado({ manifiesto }: { manifiesto: Manifiesto | null }) {
+  const [menu, setMenu] = useState(false);
   return (
     <header className="encabezado" role="banner">
       <div className="contenedor encabezado__inner">
@@ -47,10 +49,12 @@ export default function Encabezado({ manifiesto }: { manifiesto: Manifiesto | nu
           </dl>
         </div>
       </div>
-      <nav className="encabezado__nav no-imprimir" aria-label="Secciones">
+      <button className="boton menu-movil no-imprimir" aria-expanded={menu} aria-controls="navegacion" onClick={()=>setMenu(!menu)}>☰ {menu ? "Cerrar menú" : "Menú"}</button>
+      <nav id="navegacion" className={`encabezado__nav no-imprimir ${menu ? "menu-abierto" : ""}`} aria-label="Secciones" onClick={e=>{if((e.target as HTMLElement).closest("a"))setMenu(false);}}>
         <div className="sidebar-brand"><span aria-hidden="true" /><div>OBSERVATORIO<br />DE INCIDENCIA DELICTIVA<small>MÉXICO</small></div></div>
         <div className="contenedor">
-          <a href="#hallazgos">Hallazgos</a>
+          <a href="#hallazgos">⌂ Inicio y hallazgos</a>
+          <a href="#resumen">▤ Resumen gráfico</a>
           <a href="#delitos">Delitos de mayor incidencia</a>
           <a href="#municipios">Ranking municipal</a>
           <a href="#explorador">Explorador territorial</a>

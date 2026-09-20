@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useId, useMemo, useRef, useState } from "react";
 import type { Territorio } from "../lib/geo";
 import { marcoDe, rutaSVG, cortesCuantiles, clase } from "../lib/geo";
 import { SECUENCIAL } from "../theme/paleta";
@@ -30,6 +30,8 @@ export const soportaWebGL = (() => {
 })();
 
 export default function MapaMx(p: Props) {
+  const uid = useId().replace(/:/g, "");
+  const sinDatoId = `sin-dato-${uid}`, relieveId = `relieve-${uid}`;
   const oscuro = document.documentElement.getAttribute("data-theme") === "dark" ||
     (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
   const rampa = SECUENCIAL[oscuro ? "dark" : "light"];
@@ -45,7 +47,7 @@ export default function MapaMx(p: Props) {
 
   const colorDe = (cve: string): string => {
     const d = p.valores[cve];
-    if (!d || d.v == null) return "url(#sin-dato)";
+    if (!d || d.v == null) return `url(#${sinDatoId})`;
     if (d.v === 0) return "var(--surface)";
     return rampa[Math.min(clase(d.v, cortes), rampa.length - 1)];
   };
@@ -77,15 +79,15 @@ export default function MapaMx(p: Props) {
         <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}
           role="group" aria-label={`${p.titulo}. Mapa coroplético; los valores exactos están en la tabla adjunta.`}>
           <defs>
-            <pattern id="sin-dato" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <pattern id={sinDatoId} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
               <rect width="6" height="6" fill="var(--surface)" />
               <line x1="0" y1="0" x2="0" y2="6" stroke="var(--axis)" strokeWidth="1.4" />
             </pattern>
-            <filter id="relieve" x="-4%" y="-4%" width="108%" height="108%">
+            <filter id={relieveId} x="-4%" y="-4%" width="108%" height="108%">
               <feDropShadow dx="0" dy="1.2" stdDeviation="1.4" floodColor="#14212E" floodOpacity={oscuro ? 0.5 : 0.18} />
             </filter>
           </defs>
-          <g filter="url(#relieve)">
+          <g filter={`url(#${relieveId})`}>
             {p.territorios.map(t => (
               <path key={t.cve}
                 d={rutaSVG(t, marco, W, H)}

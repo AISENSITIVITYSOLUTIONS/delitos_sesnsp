@@ -258,3 +258,86 @@ dialog.calculo::backdrop { background: rgba(11, 21, 32, 0.5); backdrop-filter: b
   .filtros { position:relative; }
   .hallazgos-grid { grid-template-columns:1fr; }
 }
+
+/* Portada analítica: tarjetas compactas y matriz adaptable. */
+.contenedor { width:100%; max-width:1920px; }
+.encabezado__inner { align-items:center; padding-top:16px; padding-bottom:16px; gap:12px; }
+.encabezado__titulo { font-size:clamp(20px,2vw,28px); }
+.encabezado__sub { font-size:12px; margin-top:6px; }
+.encabezado__marca { flex:1 1 380px; min-width:0; }
+.estado-lista { padding:8px 12px; gap:8px 14px; }
+.estado-lista div { min-width:0; }
+.estado-lista dt { font-size:10px; }
+.estado-lista dd { font-size:11px; }
+#hallazgos { padding-top:14px; }
+#hallazgos .seccion__head h2 { font-size:17px; }
+#hallazgos .seccion__desc { font-size:12px; max-width:none; }
+.hallazgos-grid { grid-template-columns:repeat(5,minmax(0,1fr)); align-items:start; gap:10px; }
+.hallazgo { padding:12px; min-width:0; gap:5px; }
+.hallazgo__titulo { font-size:12px; line-height:1.35; }
+.hallazgo__cifra { font-size:25px; }
+.hallazgo__cifra small { display:block; font-size:11px; line-height:1.4; margin-top:4px; }
+.hallazgo__comp, .hallazgo__periodo { font-size:11px; }
+.hallazgo-detalle { font-size:11px; color:var(--ink-2); }
+.hallazgo-detalle summary { cursor:pointer; padding:8px 0; color:var(--acento); }
+.hallazgo__pie { padding-top:0; }
+.resumen-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0 24px; }
+.resumen-panel { min-width:0; padding:16px; display:flex; flex-direction:column; gap:8px; }
+.resumen-panel h2 { font-size:17px; }
+.resumen-panel>a { font-size:12px; margin-top:auto; padding-top:8px; }
+.resumen-mapa .mapa-caja { min-height:320px; box-shadow:none; }
+.resumen-mapa .mapa-caja>svg { max-height:300px; }
+.resumen-mapa .mapa-leyenda { position:relative; left:auto; bottom:auto; margin:4px 10px 10px; padding:6px 8px; width:fit-content; max-width:calc(100% - 20px); }
+.resumen-mapa .mapa-leyenda .fila { gap:6px!important; }
+.resumen-barras { padding:0; margin:8px 0; list-style:none; display:grid; gap:16px; }
+.resumen-barras li>div:first-child { display:flex; justify-content:space-between; gap:12px; font-size:13px; }
+.resumen-barras strong { white-space:nowrap; font-variant-numeric:tabular-nums; }
+.barra-pista { height:10px; background:var(--grid); border-radius:3px; margin-top:6px; }
+.barra-pista span { display:block; height:100%; background:linear-gradient(90deg,#006bc7,#21a5ff); border-radius:3px; }
+.tabla-scroll { overflow:auto; max-width:100%; }
+.entidad-tabla { display:block; }
+.menu-movil { display:none; }
+.fila>* , .ranking-layout>* , .explorador-layout>* { min-width:0; }
+.control { max-width:100%; }
+.seccion, .resumen-grid { scroll-margin-top:100px; }
+.encabezado__nav { overflow-y:auto; }
+@media (max-width:1199px) {
+ .hallazgos-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+ .menu-movil { display:flex; margin:0 16px 12px; min-height:44px; }
+ .encabezado__nav { display:none; }
+ .encabezado__nav.menu-abierto { display:block; }
+ .encabezado__nav .contenedor { flex-wrap:wrap; }
+ .encabezado__nav a { min-height:44px; }
+}
+@media (max-width:899px) {
+ .resumen-grid { grid-template-columns:minmax(0,1fr); }
+ .hallazgos-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .encabezado__estado { width:100%; }
+ .filtros { position:relative; }
+ .ranking-layout, .explorador-layout { grid-template-columns:minmax(0,1fr); }
+}
+@media (max-width:599px) {
+ .contenedor { padding-left:12px; padding-right:12px; }
+ .encabezado__sello { display:none; }
+ .encabezado__marca { flex-basis:100%; }
+ .encabezado__kicker { font-size:9px; }
+ .estado-lista { flex:1; display:grid; grid-template-columns:1fr; }
+ .hallazgos-grid { grid-template-columns:minmax(0,1fr); }
+ .hallazgo__titulo { font-size:14px; }
+ .hallazgo__cifra small { display:inline; }
+ .resumen-panel { padding:12px; }
+ .filtros .contenedor { align-items:stretch; }
+ .filtros select { width:100%; }
+ .filtros .sep { display:none; }
+ .boton, .control, .seg button, .tab-delito, .tema-btn, .ver-calculo { min-height:44px; }
+ .seg { flex-wrap:wrap; max-width:100%; }
+ .buscador { min-width:0; flex-basis:100%; }
+ .tabs-delitos { flex-direction:column; }
+ .tab-delito { flex-wrap:wrap; text-align:left; }
+ .mapa-caja { min-height:340px; }
+ .mapa-leyenda { max-width:calc(100% - 24px); }
+ table.datos { font-size:12px; }
+ table.datos th, table.datos td { padding:8px 6px; }
+ dialog.calculo { max-height:85dvh; overflow:auto; }
+}
+@media print { .menu-movil { display:none; } .resumen-grid { grid-template-columns:1fr; } }

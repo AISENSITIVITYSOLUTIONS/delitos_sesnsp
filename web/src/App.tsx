@@ -1,3 +1,4 @@
+import Resumen from "./components/Resumen";
 import { useEffect, useMemo, useState } from "react";
 import Encabezado from "./components/Encabezado";
 import TarjetaHallazgo from "./components/TarjetaHallazgo";
@@ -193,7 +194,9 @@ export default function App() {
           </div>
         </section>
 
-        <section className="seccion" id="delitos" aria-labelledby="t-delitos">
+        <Resumen sn={sn} estatal={datos.estatal} pob={datos.pob} ranking={ranking}
+          municipios={datos.rankingMunicipios.periodos[periodoRanking]} completo={tramoSel === "completo"} />
+        <section className="seccion detalle-seccion" id="delitos" aria-labelledby="t-delitos">
           <div className="seccion__head">
             <span className="seccion__num">02</span>
             <h2 id="t-delitos">Los cinco delitos de mayor incidencia</h2>
