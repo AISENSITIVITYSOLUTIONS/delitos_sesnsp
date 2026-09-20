@@ -22,7 +22,7 @@ export default function Resumen({ sn, estatal, pob, ranking, municipios, complet
    return v == null ? null : metrica==="tasa" ? (p>0 ? v/p*100000 : null) : v;
  });
  const anio = estatal.anios.filter(a=>a>=Number(desde.slice(0,4)) && a<=Number(hasta.slice(0,4))).at(-1);
- const compatible = !completo && estatal.metodologia===sn.metodologia && anio!=null;
+ const compatible = !completo && anio!=null && (sn.metodologia==="NM-2015" ? anio<=2025 : anio>=2026);
  const valores = Object.fromEntries(Object.entries(estatal.total).map(([cve,arr])=>{
    const v=compatible ? arr[estatal.anios.indexOf(anio!)] : null;
    const p=anio ? pob.estatal[cve]?.[String(anio)] : null;
