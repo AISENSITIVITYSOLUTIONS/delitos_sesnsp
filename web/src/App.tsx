@@ -151,7 +151,7 @@ export default function App() {
     ? `enero–${m.cortes.tramo_2026} de 2026 (registro vigente desde 2026)`
     : tramoSel === "completo"
       ? "2015–2026, solo series homologadas"
-      : "enero 2015 – diciembre 2025 (instrumento de 53 delitos)";
+      : "enero 2015 – diciembre 2025 (catálogo histórico · ver listado en el comparador)";
 
   return (
     <>
@@ -171,7 +171,7 @@ export default function App() {
                 hasta: v === "2026" ? m.cortes.tramo_2026 : v === "completo" ? m.cortes.tramo_2026 : "2025-12",
               });
             }}>
-            <option value="2015-2025">2015–2025 · instrumento de 53 delitos</option>
+            <option value="2015-2025">2015–2025 · catálogo histórico · ver listado en el comparador</option>
             <option value="2026">2026 en adelante · registro nuevo</option>
             <option value="completo">Periodo completo · solo series homologadas</option>
           </select>
