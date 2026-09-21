@@ -63,3 +63,7 @@ html:not([data-efectos=apagado]) :is(.ni-tabs button,.impacto-tabs button,.seg b
 @media(hover:none),(pointer:coarse){html[data-efectos=cinematico] .fx-etiqueta{transform:none}html:not([data-efectos=apagado]) .impacto-hero .impacto-badge{display:inline-block;white-space:normal;max-width:100%}}
 @media(prefers-reduced-motion:reduce){html .fx-etiqueta{transform:none!important;transition:none!important;animation:none!important}}
 @media print{html .fx-etiqueta{transform:none!important;box-shadow:none!important;text-shadow:none!important}.fx-etiqueta::after{display:none!important}}
+
+/* KPI: la superficie recibe luz, pero las cifras permanecen inmóviles. */
+html[data-efectos=cinematico] :is(.impacto-kpis article,.hallazgo,.impacto-kpis article.fx-active,.hallazgo.fx-active,.impacto-kpis article>strong){transform:none;text-shadow:none}
+html:not([data-efectos=apagado]) :is(.impacto-kpis article,.hallazgo)::after{background:radial-gradient(ellipse at var(--mx,25%) var(--my,0%),#73a7ef18,transparent 65%)}

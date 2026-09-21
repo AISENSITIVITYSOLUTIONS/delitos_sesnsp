@@ -20,6 +20,9 @@ interface Props {
   metrica: "conteo" | "tasa";
   onSeleccion?: (cve: string) => void;
   onFallo: () => void;
+  seleccionado?: string | null;
+  vistaGuardada?: MapViewState;
+  onVista?: (v:MapViewState)=>void;
   fmt: (v: number | null) => string;
 }
 
@@ -46,26 +49,30 @@ const hexARgb = (hex: string): [number, number, number] => {
 export default function Mapa3D(p: Props) {
   const contenedor=useRef<HTMLDivElement>(null);
   const [calidad,setCalidad]=useState(1);
+  const [modo,setModo]=useState(document.documentElement.dataset.efectos??'estandar');
+  const [activo,setActivo]=useState(true);
+  useEffect(()=>{let visible=true;const actualizar=()=>setActivo(visible&&!document.hidden);const obs=new IntersectionObserver(([e])=>{visible=e.isIntersecting;actualizar();},{rootMargin:'100px'});if(contenedor.current)obs.observe(contenedor.current);document.addEventListener('visibilitychange',actualizar);actualizar();return()=>{obs.disconnect();document.removeEventListener('visibilitychange',actualizar);};},[]);
   useEffect(()=>{
     const node=contenedor.current;
-    const perdido=()=>p.onFallo();
+    const perdido=(event:Event)=>{event.preventDefault();p.onFallo();};
     node?.addEventListener("webglcontextlost",perdido,true);
-    const ajustar=()=>{const n=navigator as Navigator & {deviceMemory?:number};const limitada=matchMedia("(pointer:coarse)").matches||(n.deviceMemory!=null&&n.deviceMemory<=4)||navigator.hardwareConcurrency<=4;setCalidad(document.documentElement.dataset.efectos==="cinematico"&&!limitada?Math.min(devicePixelRatio||1,1.5):1);};
+    const ajustar=()=>{setModo(document.documentElement.dataset.efectos??'estandar');const n=navigator as Navigator & {deviceMemory?:number};const limitada=matchMedia("(pointer:coarse)").matches||(n.deviceMemory!=null&&n.deviceMemory<=4)||navigator.hardwareConcurrency<=4;setCalidad(document.documentElement.dataset.efectos==="cinematico"&&!limitada?Math.min(devicePixelRatio||1,1.5):1);};
     ajustar();const obs=new MutationObserver(ajustar);obs.observe(document.documentElement,{attributes:true,attributeFilter:["data-efectos"]});window.addEventListener("resize",ajustar);
     return()=>{node?.removeEventListener("webglcontextlost",perdido,true);obs.disconnect();window.removeEventListener("resize",ajustar);};
   },[p.onFallo]);
   const luces = useMemo(() => [new LightingEffect({
-    ambiente: new AmbientLight({ color: [215, 232, 255], intensity: 1.1 }),
-    principal: new DirectionalLight({ color: [215, 232, 255], intensity: 1.2, direction: [-2, -3, -4] }),
-    relleno: new DirectionalLight({ color: [215, 232, 255], intensity: 0.4, direction: [3, 1, -2] }),
+    ambiente: new AmbientLight({ color: [215, 232, 255], intensity: 0.8 }),
+    principal: new DirectionalLight({ color: [215, 232, 255], intensity: 0.85, direction: [-2, -3, -4] }),
+    relleno: new DirectionalLight({ color: [215, 232, 255], intensity: 0.25, direction: [3, 1, -2] }),
   })], []);
   const [malla, setMalla] = useState(false);
   const [ortografica, setOrtografica] = useState(false);
   const [relieve, setRelieve] = useState(1);
   const inicial = useMemo(() => vistaInicial(p.territorios), [p.territorios]);
-  const [vista, setVista] = useState<MapViewState>(inicial);
-  useEffect(() => { setVista(inicial); }, [inicial]);
-  const reducirMovimiento = document.documentElement.dataset.efectos === "apagado" || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [vista, setVista] = useState<MapViewState>(p.vistaGuardada??inicial);
+  useEffect(() => { setVista(p.vistaGuardada??inicial); }, [inicial]);
+  useEffect(()=>{p.onVista?.(vista);},[vista,p.onVista]);
+  const reducirMovimiento = !activo || modo === "apagado";
 
   const datos = useMemo(() => p.territorios.map(t => {
     const d = p.valores[t.cve];
@@ -91,10 +98,11 @@ export default function Mapa3D(p: Props) {
     },
     getLineColor: [255, 255, 255, 60],
     material: { ambient: 0.42, diffuse: 0.75, shininess: 8, specularColor: [35, 40, 48] },
-    transitions: reducirMovimiento ? undefined : { getElevation: 420 },
+    transitions: reducirMovimiento ? undefined : { getElevation: {duration:modo==='cinematico'?650:220,easing:(t:number)=>t*t*(3-2*t)} },
     updateTriggers: { getElevation: [escalaAltura], getFillColor: [p.rampa, p.cortes] },
-  }), [datos, escalaAltura, p.rampa, p.cortes, reducirMovimiento, malla]);
+  }), [datos, escalaAltura, p.rampa, p.cortes, reducirMovimiento, malla, modo]);
 
+  const seleccion = useMemo(()=>new PolygonLayer({id:'seleccion-territorial',data:datos.filter(d=>d.cve===p.seleccionado),getPolygon:d=>d.pols.map((ring:number[][])=>ring.map(([x,y]:number[])=>[x,y,(d.valor??0)*escalaAltura+100])),filled:false,stroked:true,getLineColor:[59,130,246,255],getLineWidth:3,lineWidthUnits:'pixels',pickable:false}),[datos,p.seleccionado,escalaAltura]);
   const tooltip = useCallback((info: PickingInfo) => {
     const d = info.object as (typeof datos)[number] | undefined;
     if (!d) return null;
@@ -114,12 +122,12 @@ export default function Mapa3D(p: Props) {
   return (
     <div className="mapa-3d-escena" ref={contenedor} style={{ position: "relative", width: "100%", height: "clamp(360px, 55vw, 560px)" }}>
       <label className="mapa-relieve no-imprimir" style={{position:"absolute",left:12,bottom:64,zIndex:5,background:"var(--surface)",padding:8,borderRadius:8}}>Relieve visual <input aria-label="Intensidad del relieve 3D" type="range" min="0" max="1" step="0.1" value={relieve} onChange={e=>setRelieve(Number(e.target.value))}/></label>
-      <DeckGL
+      {activo&&<DeckGL
         views={new MapView({ orthographic: ortografica })}
         viewState={vista}
         onViewStateChange={({ viewState }) => setVista(viewState as MapViewState)}
         controller={{ dragRotate: true, touchRotate: true, inertia: !reducirMovimiento }}
-        layers={[capa]}
+        layers={[capa,seleccion]}
         effects={luces}
         useDevicePixels={calidad}
         onError={()=>p.onFallo()}
@@ -129,12 +137,12 @@ export default function Mapa3D(p: Props) {
           if (d) p.onSeleccion?.(d.cve);
         }}
         style={{ position: "absolute", inset: "0" }}
-      />
+      />}
       <div style={{ position: "absolute", right: 12, bottom: 12, zIndex: 5, display: "flex", flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "calc(100% - 24px)", gap: 6 }} className="no-imprimir mapa-3d-actions">
         <button className="boton" aria-label="Acercar mapa" onClick={()=>setVista(v=>({...v,zoom:Math.min(12,v.zoom+0.5)}))}>＋</button>
         <button className="boton" aria-label="Alejar mapa" onClick={()=>setVista(v=>({...v,zoom:Math.max(2,v.zoom-0.5)}))}>−</button>
         <button className="boton" aria-pressed={malla} onClick={()=>setMalla(!malla)}>Malla 3D</button>
-        <button className="boton" aria-pressed={ortografica} onClick={()=>setOrtografica(!ortografica)}>{ortografica?"Ortográfica":"Perspectiva"}</button>
+        <button className="boton" aria-pressed={ortografica} onClick={()=>{setOrtografica(!ortografica);setVista(v=>({...v,pitch:ortografica?46:0,bearing:ortografica?-12:0,transitionDuration:reducirMovimiento?0:550,transitionInterpolator:new LinearInterpolator(['pitch','bearing'])}));}}>{ortografica?"Ortográfica":"Perspectiva"}</button>
         <button className="boton" onClick={() => inclina(12)} aria-label="Aumentar inclinación">Inclinar ▲</button>
         <button className="boton" onClick={() => inclina(-12)} aria-label="Reducir inclinación">▼</button>
         <button className="boton" onClick={() => gira(-20)} aria-label="Rotar a la izquierda">⟲</button>

@@ -1,3 +1,4 @@
+import type {MapViewState} from '@deck.gl/core';
 import Limite3D from "./Limite3D";
 import { lazy, Suspense, useCallback, useId, useMemo, useRef, useState } from "react";
 import type { Territorio } from "../lib/geo";
@@ -35,6 +36,8 @@ export const soportaWebGL = (() => {
 })();
 
 export default function MapaMx(p: Props) {
+  const vistaGuardada=useRef<MapViewState|undefined>(undefined);
+  const guardarVista=useCallback((v:MapViewState)=>{vistaGuardada.current=v;},[]);
   const [fallo3D,setFallo3D]=useState(false);
   const [consulta,setConsulta]=useState("");
   const fallo=useCallback(()=>{setFallo3D(true);p.onModo("2d");},[p.onModo]);
@@ -79,12 +82,13 @@ export default function MapaMx(p: Props) {
       </div>
 
       {(!soportaWebGL||fallo3D)&&<p className="nota" role="status">Vista 2D activa: {fallo3D?"la vista 3D no pudo mantenerse":"WebGL 2 no está disponible"}. Se conservan los mismos valores y la selección territorial.</p>}
+      {fallo3D&&soportaWebGL&&<button className="boton" onClick={()=>{setFallo3D(false);p.onModo("3d");}}>Reintentar vista 3D sin recargar</button>}
       {el3D ? (
         <Limite3D onFallo={fallo}>
         <Suspense fallback={<p className="nota" style={{ padding: 20 }}>Cargando vista 3D…</p>}>
-          <Mapa3D territorios={p.territorios} valores={p.valores} rampa={rampa}
+          <Mapa3D vistaGuardada={vistaGuardada.current} onVista={guardarVista} territorios={p.territorios} valores={p.valores} rampa={rampa}
             cortes={cortes} maxV={maxV} metrica={p.metrica}
-            onSeleccion={p.onSeleccion} fmt={fmt} onFallo={fallo} />
+            onSeleccion={p.onSeleccion} seleccionado={p.seleccionado??consulta} fmt={fmt} onFallo={fallo} />
         </Suspense>
         </Limite3D>
       ) : (
