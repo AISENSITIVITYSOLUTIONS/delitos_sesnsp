@@ -3,6 +3,7 @@ import Efectos3D from "./components/Efectos3D";
 import TerritorioImpacto from "./components/TerritorioImpacto";
 import AltoImpacto from "./components/AltoImpacto";
 import Resumen from "./components/Resumen";
+import PreguntasInvestigacion from './components/PreguntasInvestigacion';
 import Laboratorio from "./components/Laboratorio";
 import { useEffect, useMemo, useState } from "react";
 import Encabezado from "./components/Encabezado";
@@ -186,9 +187,10 @@ export default function App() {
       </div>
 
       <main id="contenido" className="contenedor">
-        <Laboratorio nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} estatal={datos.estatal} municipal={datos.municipal} manifiesto={m}/>
-        <AltoImpacto nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} />
+        <PreguntasInvestigacion />
         <TerritorioImpacto estatal={datos.estatal} sn={datos.nacionalNM} pob={datos.pob}/>
+        <AltoImpacto nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} />
+        <Laboratorio nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} estatal={datos.estatal} municipal={datos.municipal} manifiesto={m}/>
         <section className="seccion" id="hallazgos" aria-labelledby="t-hallazgos">
           <div className="seccion__head">
             <span className="seccion__num">01</span>
