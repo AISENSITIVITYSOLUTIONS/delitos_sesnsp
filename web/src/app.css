@@ -246,7 +246,11 @@ dialog.calculo::backdrop { background: rgba(11, 21, 32, 0.5); backdrop-filter: b
   .encabezado__nav .contenedor { display:flex; flex-direction:column; padding:0; margin:0; overflow:visible; gap:10px; }
   .encabezado__nav a { padding:13px 12px; border-radius:7px; white-space:normal; border-bottom:0; }
   .sidebar-brand { display:flex; gap:12px; align-items:center; margin-bottom:40px; color:#edf5ff; font-size:12px; line-height:1.5; letter-spacing:.05em; font-weight:600; }
-  .sidebar-brand span { width:42px; height:42px; flex-shrink:0; border:7px solid #078cff; border-right-color:#63c3ff; border-radius:50%; box-shadow:0 0 22px #007bff33; }
+  .sidebar-brand .sidebar-logo { position:relative; display:block; padding:0; margin:0; min-height:0; background:none; border:0; width:56px; height:56px; flex-shrink:0; border-radius:50%; perspective:400px; }
+  .sidebar-brand .sidebar-logo img { display:block; width:56px; height:56px; max-width:none; min-width:56px; border-radius:50%; box-shadow:0 8px 18px #0008, 0 0 18px #61e7fa38; animation:nni-logo-flota 8s ease-in-out infinite; }
+  .sidebar-logo::after { content:""; position:absolute; inset:-6px; border-radius:50%; border:1px dashed #61e7fa99; border-top-color:transparent; animation:nni-logo-orbita 12s linear infinite; pointer-events:none; }
+  .sidebar-logo:hover::after { animation-duration:3s; }
+  .sidebar-logo:focus-visible { outline:2px solid #61e7fa; outline-offset:6px; }
   .sidebar-brand small { display:block; color:#38adff; margin-top:4px; }
   .sidebar-caption { display:block; margin-top:auto; padding:24px 12px 4px; color:#a8c4df; font-size:11px; line-height:1.8; letter-spacing:.14em; text-transform:uppercase; }
   .encabezado__inner { padding-top:24px; padding-bottom:24px; }
@@ -381,3 +385,7 @@ dialog.calculo::backdrop { background: rgba(11, 21, 32, 0.5); backdrop-filter: b
 @media(max-width:1000px) { .persistencia .impacto-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:600px) { .persistencia .impacto-kpis { grid-template-columns:1fr; } }
 @media print { .impacto-tabla { max-height:none; overflow:visible; } .impacto-kpis article { transform:none!important; box-shadow:none; } }
+
+@keyframes nni-logo-flota { 0%,100% { transform:rotateY(-16deg) rotateX(8deg); } 50% { transform:rotateY(16deg) rotateX(-6deg); } }
+@keyframes nni-logo-orbita { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .sidebar-logo img, .sidebar-logo::after { animation:none; } }
