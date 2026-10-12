@@ -11,3 +11,5 @@ html[data-paleta=esmeralda] .ni-lab{--lab-acento:#80cbb9;--lab-superficie:#13292
 @media(max-width:900px){.ni-preguntas{grid-template-columns:repeat(2,minmax(0,1fr))}.ni-preguntas a:last-child{grid-column:1/-1}}
 @media(max-width:540px){.ni-preguntas,.ni-pending{grid-template-columns:1fr}.ni-controls{display:block}.ni-controls label{margin-bottom:12px}.ni-lab-hero:after{opacity:.3}.ni-tabs button{flex:1 1 140px}}
 @media(prefers-reduced-motion:no-preference){html[data-efectos=cinematico] .ni-preguntas a{transition:transform .2s,box-shadow .2s}@media(hover:hover){html[data-efectos=cinematico] .ni-preguntas a:hover{transform:translateY(-4px);box-shadow:0 12px 28px var(--lab-luz)}}}
+
+.ni-lab-head{margin:0 0 4px}.ni-lab-head h2{font-size:clamp(24px,2.6vw,32px);margin:6px 0 0}
