@@ -7,3 +7,4 @@ __pycache__/
 node_modules/
 # Respaldo que genera el publicador
 /web/public/datos_prev/
+/raw_victimas/
