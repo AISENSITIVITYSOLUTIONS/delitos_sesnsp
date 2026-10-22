@@ -37,7 +37,7 @@ function Spark({ valores }: { valores: number[] }) {
   const u = pts.at(-1)!;
   return (
     <svg className="fd-spark" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
-      <path className="fd-area" d={dArea} /><path className="fd-linea" d={d} />
+      <path className="fd-area" d={dArea} /><path className="fd-linea" d={d} pathLength={1} />
       <circle cx={u[0]} cy={u[1]} r={3.4} />
     </svg>
   );
@@ -149,7 +149,7 @@ function TarjetaDelito({ f, etiqueta, metrica }: { f: Ficha; etiqueta: string; m
   const trendTxt = cambio == null ? "s/d" : `${fPct(cambio)} (${f.a0}→${String(f.a1).slice(2)})`;
 
   return (
-    <div className="fd-scene" role="listitem" ref={sceneRef}>
+    <div className="fd-scene" role="listitem" ref={sceneRef} style={{ animationDelay: `${f.rango * 55}ms` }}>
       <div className="fd-tilt" ref={tiltRef}>
         <div className={`fd-card${volteada ? " es-volteada" : ""}`} style={{ ["--hue" as string]: f.color }}>
           <div className="fd-flip">
@@ -170,7 +170,7 @@ function TarjetaDelito({ f, etiqueta, metrica }: { f: Ficha; etiqueta: string; m
               <div className="fd-metrica" key={metrica}>
                 <p className="fd-cifra">{cifra}{esTasa && <span className="fd-u"> /100 mil</span>}</p>
                 <p className="fd-sub">{sub}</p>
-                <Spark valores={valores} />
+                <Spark key={`${metrica}-${volteada}`} valores={valores} />
               </div>
               <span className="fd-cue" aria-hidden="true"><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: CICLO }} /> voltear</span>
             </div>
