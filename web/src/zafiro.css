@@ -343,3 +343,31 @@ table.datos th.no-imprimir, table.datos td.no-imprimir { white-space: nowrap; wi
 .victimas .vz-pie strong{ color:var(--ink); }
 @media(prefers-reduced-motion:reduce){ .vz-seg{ transition:none; } }
 @media(max-width:560px){ .vz-fila{ padding:12px 13px; } .vz-nombre{ font-size:14.5px; } }
+
+/* ═══ Víctimas como fichas 3D con dona de composición por sexo ═══ */
+.victimas .fd-flip{ min-height:286px; }
+.vz-cara{ align-items:center; text-align:center; }
+.vz-cara .fd-top{ width:100%; }
+.vz-nom{ font-family:var(--serif); font-size:14.5px; font-weight:600; color:var(--ink); line-height:1.2; letter-spacing:-.01em; width:100%; min-height:2.5em; display:flex; align-items:center; justify-content:center; }
+.vz-dona-wrap{ position:relative; width:122px; height:122px; margin:6px auto 4px; }
+.vz-dona{ width:100%; height:100%; border-radius:50%;
+  -webkit-mask:radial-gradient(transparent 53%, #000 54%); mask:radial-gradient(transparent 53%, #000 54%);
+  box-shadow:0 6px 18px -8px rgba(0,0,0,.45); }
+.vz-dona-centro{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; }
+.vz-dona-pct{ font-family:var(--serif); font-size:28px; font-weight:700; color:var(--ink); line-height:1; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.vz-dona-pct small{ font-size:15px; color:var(--ink-2); font-weight:600; }
+.vz-dona-lab{ font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--vz-muj); font-weight:700; }
+.vz-tot{ margin-top:auto; font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums; }
+.vz-tot small{ color:var(--ink-3); font-size:11px; }
+.vz-cara .fd-cue{ align-self:center; }
+/* dorso: desglose */
+.fd-dorso.vz-cara{ text-align:left; align-items:stretch; }
+.vz-desglose{ display:flex; flex-direction:column; gap:9px; margin-top:12px; width:100%; }
+.vz-desglose > div{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12.5px; }
+.vz-desglose dt{ color:var(--ink-2); display:flex; align-items:center; gap:7px; }
+.vz-desglose dd{ margin:0; color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums; }
+.vz-desglose dd small{ color:var(--ink-3); font-weight:400; }
+.victimas .vz-leyenda{ display:flex; gap:16px; flex-wrap:wrap; margin:2px 0 14px; }
+.vz-li{ display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-2); }
+.vz-sw{ width:11px; height:11px; border-radius:3px; display:inline-block; flex:0 0 auto; }
+.vz-sw--muj{ background:var(--vz-muj); } .vz-sw--hom{ background:var(--vz-hom); } .vz-sw--ni{ background:var(--vz-ni); }
