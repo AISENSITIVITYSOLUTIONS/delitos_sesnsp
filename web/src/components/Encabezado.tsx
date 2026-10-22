@@ -41,10 +41,6 @@ export default function Encabezado({ manifiesto }: { manifiesto: Manifiesto | nu
               <dd>{manifiesto ? fMesLargo(manifiesto.cortes.tramo_2026 || manifiesto.cortes.tramo_2015_2025) : "—"}</dd>
             </div>
             <div>
-              <dt>Última consulta a la fuente</dt>
-              <dd>{fFechaHora(manifiesto?.ultima_consulta_fuente ?? null)}</dd>
-            </div>
-            <div>
               <dt>Última actualización validada</dt>
               <dd>{fFechaHora(manifiesto?.ultima_actualizacion_validada ?? null)}</dd>
             </div>
