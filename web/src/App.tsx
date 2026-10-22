@@ -5,6 +5,7 @@ import AltoImpacto from "./components/AltoImpacto";
 import Resumen from "./components/Resumen";
 import PreguntasInvestigacion from './components/PreguntasInvestigacion';
 import Laboratorio from "./components/Laboratorio";
+import FranjaDelitos from "./components/FranjaDelitos";
 import { useEffect, useMemo, useState } from "react";
 import Encabezado from "./components/Encabezado";
 import TarjetaHallazgo from "./components/TarjetaHallazgo";
@@ -188,6 +189,7 @@ export default function App() {
 
       <main id="contenido" className="contenedor">
         <PreguntasInvestigacion />
+        <FranjaDelitos ranking={ranking} sn={sn} />
         <TerritorioImpacto estatal={datos.estatal} sn={datos.nacionalNM} pob={datos.pob}/>
         <AltoImpacto nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} />
         <Laboratorio nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} estatal={datos.estatal} municipal={datos.municipal} manifiesto={m}/>
