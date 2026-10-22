@@ -62,6 +62,7 @@ export default function Encabezado({ manifiesto }: { manifiesto: Manifiesto | nu
           <a href="#hallazgos">⌂ Inicio y hallazgos</a>
           <a href="#resumen">▤ Resumen gráfico</a>
           <a href="#delitos">Delitos de mayor incidencia</a>
+          <a href="#victimas">◈ Víctimas por sexo</a>
           <a href="#municipios">Ranking municipal</a>
           <a href="#explorador">Explorador territorial</a>
           <a href="#metodologia">Metodología y fuentes</a>

@@ -5,6 +5,7 @@ import AltoImpacto from "./components/AltoImpacto";
 import Resumen from "./components/Resumen";
 import Laboratorio from "./components/Laboratorio";
 import FranjaDelitos from "./components/FranjaDelitos";
+import Victimas from "./components/Victimas";
 import { useEffect, useMemo, useState } from "react";
 import Encabezado from "./components/Encabezado";
 import TarjetaHallazgo from "./components/TarjetaHallazgo";
@@ -223,6 +224,8 @@ export default function App() {
             desde={est.desde} hasta={est.hasta}
             fuenteTexto={m.fuentes.map(f => f.descripcion).join(" · ")} />
         </section>
+
+        <Victimas />
 
         <section className="seccion" id="municipios" aria-labelledby="t-municipios">
           <div className="seccion__head">
