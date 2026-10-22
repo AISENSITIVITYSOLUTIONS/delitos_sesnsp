@@ -35,29 +35,29 @@ UPLOADS = Path("/mnt/user-data/uploads/ARTICULO DELITOS")
 
 FUENTES = {
     "estatal_2015_2025": {
-        "archivo": "Estatal-Delitos-2015-2025_ago2026.csv",
-        "zip": "Estatal-Delitos-2015-2025_ago2026.zip",
+        "archivo": "Estatal-Delitos-2015-2025_sep2026.csv",
+        "zip": "Estatal-Delitos-2015-2025_sep2026.zip",
         "nivel": "estatal", "metodologia": "NM-2015",
         "descripcion": "Cifras de Incidencia Delictiva Estatal 2015-2025, SESNSP (instrumento CNSP/38/15)",
         "url": "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQDbKVoKKhp4SrgMtPRM-FILARntV1yA0s8T7nu84A_HF70",
     },
     "municipal_2015_2025": {
-        "archivo": "Municipal-Delitos-2015-2025_ago2026.csv",
-        "zip": "Municipal-Delitos-2015-2025_ago2026 (4).zip",
+        "archivo": "Municipal-Delitos-2015-2025_sep2026.csv",
+        "zip": "Municipal-Delitos-2015-2025_sep2026 (4).zip",
         "nivel": "municipal", "metodologia": "NM-2015",
         "descripcion": "Cifras de Incidencia Delictiva Municipal 2015-2025, SESNSP (instrumento CNSP/38/15)",
         "url": "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQCIHz1ZZoXjRZ3IySsQQqgFAYKdzEOXXK1YXfhhEhyDMcs",
     },
     "estatal_2026": {
-        "archivo": "RNID-Delitos_Estatal-2026-ago2026.csv",
-        "zip": "RNID-Delitos_Estatal-2026-ago2026.zip",
+        "archivo": "RNID-Delitos_Estatal-2026-sep2026.csv",
+        "zip": "RNID-Delitos_Estatal-2026-sep2026.zip",
         "nivel": "estatal", "metodologia": "NR-2026",
         "descripcion": "RNID: Incidencia Delictiva Estatal 2026, SESNSP (registro vigente desde ene. 2026)",
         "url": "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQBBP0Bh8YBEQpdct54JoLbkAfsR_nJJ5RJa03UwlgRmA2E",
     },
     "municipal_2026": {
-        "archivo": "RNID-Delitos_Municipal-2026-ago2026.csv",
-        "zip": "RNID-Delitos_Municipal-2026-ago2026.zip",
+        "archivo": "RNID-Delitos_Municipal-2026-sep2026.csv",
+        "zip": "RNID-Delitos_Municipal-2026-sep2026.zip",
         "nivel": "municipal", "metodologia": "NR-2026",
         "descripcion": "RNID: Incidencia Delictiva Municipal 2026, SESNSP (registro vigente desde ene. 2026)",
         "url": "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQAUYyl5NobOT4SHGj0O54aJATRtcR7qsQmNHWj_EOOzP-M",
@@ -448,7 +448,7 @@ def manifiesto(controles: list[dict], avisos: list[str], detalle_conc: dict, ver
         "conciliacion": detalle_conc,
         "cambios": [{"ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                      "evento": "publicacion_inicial",
-                     "detalle": f"Corte ago. 2026. Totales: 2015-2025 = {resumen['total_2015_2025']:,}; 2026 (ene-ago) = {resumen['total_2026']:,}. {resumen['series_homologadas']} series homologadas.".replace(",", " ")}],
+                     "detalle": f"Corte {CORTES.get('NR','')}. Totales: 2015-2025 = {resumen['total_2015_2025']:,}; 2026 (ene a corte) = {resumen['total_2026']:,}. {resumen['series_homologadas']} series homologadas.".replace(",", " ")}],
         "avisos": avisos,
     }
     ex.escribir(STAGING, "manifiesto.json", man)
