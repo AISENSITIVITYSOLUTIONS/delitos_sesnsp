@@ -1,0 +1,9 @@
+# Artefactos del pipeline (datos crudos y de trabajo; no se versionan)
+/raw/
+/work/
+# Caches de Python y Node
+__pycache__/
+*.pyc
+node_modules/
+# Respaldo que genera el publicador
+/web/public/datos_prev/
