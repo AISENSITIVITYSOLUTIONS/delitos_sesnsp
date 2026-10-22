@@ -265,3 +265,22 @@ table.datos tbody tr:hover td { background: color-mix(in srgb, var(--acento) 7%,
 table.datos td.num, table.datos th.num { white-space: nowrap; }
 table.datos button, table.datos .ver-calculo, table.datos .boton { white-space: nowrap; }
 table.datos th.no-imprimir, table.datos td.no-imprimir { white-space: nowrap; width: 1%; }
+
+/* ═══ Ajustes solicitados: 10 fichas en dos filas, volteo cinemático, toolbar simple ═══ */
+/* Franja en rejilla que envuelve a dos filas de cinco (sin desplazamiento horizontal) */
+.fd-strip{ grid-auto-flow:row; grid-template-columns:repeat(2,1fr); overflow:visible; padding:8px 0 10px; scroll-snap-type:none; }
+@media(min-width:620px){ .fd-strip{ grid-template-columns:repeat(3,1fr); } }
+@media(min-width:900px){ .fd-strip{ grid-template-columns:repeat(4,1fr); } }
+@media(min-width:1180px){ .fd-strip{ grid-template-columns:repeat(5,1fr); } }
+
+/* Volteo más cinemático: mayor profundidad, curva suave y “lift” de sombra durante el giro */
+.fd-scene{ perspective:1700px; }
+.fd-flip{ transition:transform .92s cubic-bezier(.62,.04,.20,1); box-shadow:0 16px 38px -26px rgba(0,0,0,.5); }
+.fd-card.es-volteada .fd-flip{ box-shadow:0 34px 64px -26px rgba(0,0,0,.7); }
+.hz-flip{ transition:transform .88s cubic-bezier(.62,.04,.20,1); }
+@media(prefers-reduced-motion:reduce){ html:not([data-efectos=cinematico]) .fd-flip,html:not([data-efectos=cinematico]) .hz-flip{ transition:none; } }
+
+/* Etiqueta del toolbar «Experiencia 3D · Cinemático» */
+.fx-modo{ font-size:12px; font-weight:600; color:var(--acento); letter-spacing:.01em;
+  background:color-mix(in srgb, var(--acento) 14%, transparent);
+  border:1px solid color-mix(in srgb, var(--acento) 32%, transparent); border-radius:999px; padding:4px 12px; }

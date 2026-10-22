@@ -3,8 +3,8 @@ type Modo='cinematico'|'estandar'|'apagado';
 const etiquetas='.chip, .impacto-badge, .ni-status, .ni-tabs button, .impacto-tabs button, .seg button, .fx-toolbar button, .ni-preguntas a';
 const targets='.impacto-kpis article, .hallazgo, .resumen-grid>article, '+etiquetas;
 export default function Efectos3D(){
- const [modo,setModo]=useState<Modo>(()=>{try{const guardado=localStorage.getItem('ni-efectos');const v=guardado==='suave'?'estandar':guardado;if(['cinematico','estandar','apagado'].includes(v!))return v as Modo;}catch{/* preferences optional */}return matchMedia('(pointer:fine)').matches?'cinematico':'estandar';});
- const [eleccionExplicita,setEleccionExplicita]=useState(false);
+ const [modo]=useState<Modo>('cinematico');
+ const eleccionExplicita=true;
  const [reducido,setReducido]=useState(()=>matchMedia('(prefers-reduced-motion:reduce)').matches);
  useEffect(()=>{const q=matchMedia('(prefers-reduced-motion:reduce)'),fn=()=>setReducido(q.matches);q.addEventListener('change',fn);return()=>q.removeEventListener('change',fn);},[]);
  useEffect(()=>{
@@ -27,5 +27,5 @@ export default function Efectos3D(){
   const mutation=new MutationObserver(discover);mutation.observe(document.getElementById('root')!,{childList:true,subtree:true});
   return()=>{clear();observer.disconnect();mutation.disconnect();document.removeEventListener('pointermove',move);document.removeEventListener('pointerleave',clear);document.removeEventListener('visibilitychange',visibility);window.removeEventListener('blur',clear);window.removeEventListener('scroll',clear);};
  },[modo,reducido,eleccionExplicita]);
- return <aside className="fx-toolbar no-imprimir" aria-label="Efectos visuales"><span className="fx-diamond" aria-hidden="true">◈</span><strong>Experiencia 3D</strong><div role="group" aria-label="Intensidad de efectos">{(['cinematico','estandar','apagado'] as Modo[]).map(m=><button key={m} aria-pressed={modo===m} onClick={()=>{setEleccionExplicita(true);setModo(m);}}>{m==='cinematico'?'Cinemático':m==='estandar'?'Estándar':'Sin efectos'}</button>)}</div><small>{reducido&&!(eleccionExplicita&&modo==='cinematico')?'Movimiento reducido del dispositivo activo':modo==='cinematico'?'Etiquetas con relieve · reflejos reactivos · perspectiva':modo==='estandar'?'Iluminación estática y movimiento ligero':'Visualización estática'}</small></aside>;
+ return <aside className="fx-toolbar no-imprimir" aria-label="Experiencia 3D"><span className="fx-diamond" aria-hidden="true">◈</span><strong>Experiencia 3D</strong><span className="fx-modo">Cinemático</span></aside>;
 }
