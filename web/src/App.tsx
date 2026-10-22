@@ -23,7 +23,7 @@ function SelectorPaneles({ ranking, sn, pob, desde, hasta, fuenteTexto }: {
   ranking: { etiqueta: string; delitos: Array<{ delito_id: string; nombre: string; cantidad: number; participacion: number }> };
   sn: SeriesNacionales; pob: PoblacionAnual; desde: string; hasta: string; fuenteTexto: string;
 }) {
-  const top5 = ranking.delitos.slice(0, 5);
+  const top5 = ranking.delitos.slice(0, 10);
   const [sel, setSel] = useStateReact(0);
   const d = top5[Math.min(sel, top5.length - 1)];
   const esResidual = (n: string) => /^otros\b/i.test(n);
@@ -210,11 +210,11 @@ export default function App() {
         <section className="seccion detalle-seccion" id="delitos" aria-labelledby="t-delitos">
           <div className="seccion__head">
             <span className="seccion__num">02</span>
-            <h2 id="t-delitos">Los cinco delitos de mayor incidencia</h2>
+            <h2 id="t-delitos">Los diez delitos de mayor incidencia</h2>
           </div>
           <p className="seccion__desc">
             Ranking calculado sobre categorías mutuamente excluyentes del mismo nivel del catálogo
-            ({datos.rankingDelitos.criterio}). Los cinco delitos permanecen fijos durante la comparación temporal.
+            ({datos.rankingDelitos.criterio}). Los diez delitos permanecen fijos durante la comparación temporal.
             Comparten denominador poblacional en un mismo periodo nacional, por lo que su orden por tasa
             coincide con el orden por volumen; la frecuencia no equivale a gravedad.
           </p>
