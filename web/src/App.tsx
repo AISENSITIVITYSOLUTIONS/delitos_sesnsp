@@ -189,6 +189,7 @@ export default function App() {
 
       <main id="contenido" className="contenedor">
         <FranjaDelitos ranking={ranking} sn={sn} pob={datos.pob} />
+        <Victimas />
         <TerritorioImpacto estatal={datos.estatal} sn={datos.nacionalNM} pob={datos.pob}/>
         <AltoImpacto nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} />
         <Laboratorio nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} estatal={datos.estatal} municipal={datos.municipal} manifiesto={m}/>
@@ -224,8 +225,6 @@ export default function App() {
             desde={est.desde} hasta={est.hasta}
             fuenteTexto={m.fuentes.map(f => f.descripcion).join(" · ")} />
         </section>
-
-        <Victimas />
 
         <section className="seccion" id="municipios" aria-labelledby="t-municipios">
           <div className="seccion__head">
