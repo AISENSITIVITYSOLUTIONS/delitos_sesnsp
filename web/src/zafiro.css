@@ -296,3 +296,19 @@ table.datos th.no-imprimir, table.datos td.no-imprimir { white-space: nowrap; wi
   to{ opacity:1; transform:none; filter:blur(0); }
 }
 @media(prefers-reduced-motion:reduce){ .fd-metrica{ animation:none; } }
+
+/* ═══ Experiencia cinemática: entrada escalonada de fichas y trazo del minigráfico ═══ */
+@keyframes fd-entrada{ from{ opacity:0; transform:translateY(16px) scale(.985); } to{ opacity:1; transform:none; } }
+.fd-scene{ animation:fd-entrada .55s cubic-bezier(.2,.75,.2,1) both; }
+
+/* El minigráfico se “dibuja” (remonta con key al cargar, voltear y cambiar métrica) */
+.fd-linea{ stroke-dasharray:1; stroke-dashoffset:1; animation:fd-trazo .9s .12s cubic-bezier(.4,0,.2,1) forwards; }
+@keyframes fd-trazo{ to{ stroke-dashoffset:0; } }
+.fd-area{ animation:fd-area-in .7s .28s ease-out both; }
+@keyframes fd-area-in{ from{ opacity:0; } to{ opacity:1; } }
+
+@media(prefers-reduced-motion:reduce){
+  .fd-scene{ animation:none; }
+  .fd-linea{ stroke-dashoffset:0; animation:none; }
+  .fd-area{ animation:none; opacity:1; }
+}
