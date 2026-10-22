@@ -14,3 +14,72 @@ html .fx-toolbar button[aria-pressed=true],html .boton--primario,html .seg butto
 html .barra-pista>span{background-image:none}
 .cambio{font-variant-numeric:tabular-nums}.cambio small{font-size:12px;font-weight:400}.cambio--baja,.hallazgo__comp--baja{color:var(--delta-down)!important}.cambio--alza,.hallazgo__comp--alza{color:var(--delta-up)!important}.cambio--igual,.cambio--sin-dato{color:var(--delta-zero)}
 html .impacto-kpis .cambio small{display:block;margin-top:6px}
+
+/* ════════════════════════════════════════════════════════════════════
+   Tarjetas de hallazgo con volteo 3D (premium). Se apoyan en el sistema
+   de efectos existente (luz reactiva por --mx/--my y data-efectos) y
+   respetan tema claro/oscuro, foco visible y movimiento reducido.
+   ════════════════════════════════════════════════════════════════════ */
+.hallazgo--flip{ overflow:visible; padding:0; perspective:1500px; background:transparent; min-width:0; }
+.hallazgo--flip::before{ z-index:3; border-radius:3px; }           /* conserva la pleca lateral de acento */
+.hz-flip{
+  position:relative; display:grid; min-height:244px; border-radius:inherit;
+  transform-style:preserve-3d; transition:transform .72s cubic-bezier(.76,.02,.2,1);
+  will-change:transform;
+}
+.hallazgo--flip.es-volteada .hz-flip{ transform:rotateY(180deg); }
+.hz-cara{
+  grid-area:1/1; display:flex; flex-direction:column; gap:7px;
+  padding:14px 15px 13px; border-radius:inherit; min-width:0;
+  -webkit-backface-visibility:hidden; backface-visibility:hidden;
+  background:linear-gradient(168deg, var(--surface-2), var(--surface) 72%);
+  box-shadow:inset 0 1px 0 color-mix(in srgb, var(--ink) 6%, transparent);
+}
+.hz-cara--dorso{ transform:rotateY(180deg); background:linear-gradient(168deg, var(--surface-2), color-mix(in srgb, var(--acento) 5%, var(--surface)) 82%); }
+/* Brillo reactivo: lee las variables que Efectos3D fija en .hallazgo */
+.hz-cara::after{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:radial-gradient(130% 80% at var(--mx,30%) var(--my,0%), color-mix(in srgb, var(--acento) 16%, transparent), transparent 60%);
+  opacity:.55; mix-blend-mode:screen;
+}
+.hz-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.hz-rotulo{ font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--acento); }
+.hz-rotulo--dorso{ color:var(--ink-2); }
+.hz-indice{ color:var(--acento); font-size:15px; opacity:.8; line-height:1; }
+.hallazgo--flip .hallazgo__cifra{ font-size:30px; font-weight:800; letter-spacing:-.02em; line-height:1.02; margin-top:2px; }
+.hallazgo--flip .hallazgo__cifra small{ font-size:12px; font-weight:500; color:var(--ink-2); letter-spacing:0; }
+.hallazgo--flip .spark{ width:100%; height:38px; margin:2px 0 0; }
+.hallazgo--flip .hallazgo__periodo{ font-size:11px; color:var(--ink-3); line-height:1.35; }
+.hz-cue{
+  margin-top:auto; align-self:flex-start; display:inline-flex; align-items:center; gap:6px;
+  font-size:10.5px; font-weight:600; letter-spacing:.02em; color:var(--ink-3);
+  border:1px solid var(--border); border-radius:999px; padding:4px 10px 4px 8px;
+  background:color-mix(in srgb, var(--ink) 3%, transparent);
+}
+.hz-cue svg{ width:12px; height:12px; color:var(--acento); }
+.hallazgo--flip:hover .hz-cue{ color:var(--ink-2); border-color:var(--border-strong); }
+/* Dorso */
+.hz-hallazgo{ font-size:12.5px; font-weight:650; color:var(--ink); line-height:1.34; }
+.hallazgo--flip .hallazgo__comp{ font-size:11.5px; font-weight:600; color:var(--ink-2); }
+.hallazgo--flip .hallazgo__interpretacion{ font-size:11.5px; color:var(--ink-2); line-height:1.44; min-height:0; }
+.hz-pie{ margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:8px; padding-top:8px; border-top:1px solid var(--border); }
+.hz-pie .hallazgo__validez{ font-size:10px; color:var(--ink-3); line-height:1.3; }
+.hz-volver{
+  display:inline-grid; place-items:center; width:30px; height:30px; flex:0 0 auto;
+  border:1px solid var(--border); border-radius:9px; background:transparent; color:var(--acento); cursor:pointer;
+}
+.hz-volver svg{ width:15px; height:15px; }
+.hz-volver:hover{ border-color:var(--border-strong); background:color-mix(in srgb, var(--acento) 8%, transparent); }
+.hallazgo--flip .ver-calculo{ white-space:nowrap; }
+
+/* En táctil el volteo sigue funcionando (clic); el tilt del dispositivo no aplica */
+@media (hover:none),(pointer:coarse){ .hz-flip{ min-height:232px; } }
+/* Modo sin efectos y movimiento reducido: el volteo es instantáneo, nunca animado */
+html[data-efectos=apagado] .hz-flip{ transition:none; }
+@media (prefers-reduced-motion:reduce){ html:not([data-efectos=cinematico]) .hz-flip{ transition:none; } }
+@media print{
+  .hz-flip{ transform:none!important; }
+  .hz-cara{ position:static; -webkit-backface-visibility:visible; backface-visibility:visible; box-shadow:none; }
+  .hz-cara--dorso{ transform:none; margin-top:10px; }
+  .hz-cue,.hz-volver{ display:none!important; }
+}
