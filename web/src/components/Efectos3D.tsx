@@ -27,5 +27,5 @@ export default function Efectos3D(){
   const mutation=new MutationObserver(discover);mutation.observe(document.getElementById('root')!,{childList:true,subtree:true});
   return()=>{clear();observer.disconnect();mutation.disconnect();document.removeEventListener('pointermove',move);document.removeEventListener('pointerleave',clear);document.removeEventListener('visibilitychange',visibility);window.removeEventListener('blur',clear);window.removeEventListener('scroll',clear);};
  },[modo,reducido,eleccionExplicita]);
- return <aside className="fx-toolbar no-imprimir" aria-label="Experiencia 3D"><span className="fx-diamond" aria-hidden="true">◈</span><strong>Experiencia 3D</strong><span className="fx-modo">Cinemático</span></aside>;
+ return null;
 }
