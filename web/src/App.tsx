@@ -187,7 +187,7 @@ export default function App() {
       </div>
 
       <main id="contenido" className="contenedor">
-        <FranjaDelitos ranking={ranking} sn={sn} />
+        <FranjaDelitos ranking={ranking} sn={sn} pob={datos.pob} />
         <TerritorioImpacto estatal={datos.estatal} sn={datos.nacionalNM} pob={datos.pob}/>
         <AltoImpacto nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} />
         <Laboratorio nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} estatal={datos.estatal} municipal={datos.municipal} manifiesto={m}/>

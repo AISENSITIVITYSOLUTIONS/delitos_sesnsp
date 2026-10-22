@@ -1,8 +1,9 @@
 import { useEffect, useId, useRef, useState } from "react";
-import type { SeriesNacionales } from "../lib/contratos";
-import { serieMensual, aAnual, acumulado } from "../lib/series";
+import type { SeriesNacionales, PoblacionAnual } from "../lib/contratos";
+import { serieMensual, aAnual, acumulado, tasaPeriodo, tasaAnual } from "../lib/series";
 import { colorDelito } from "../theme/paleta";
-import { fEntero, fCompacto, fPct } from "../lib/formato";
+import { fEntero, fCompacto, fPct, fTasa } from "../lib/formato";
+import { useEstado } from "../lib/estado";
 
 /** Íconos de trazo por delito (genéricos, sin color propio). */
 const ICONOS: Record<string, string> = {
@@ -24,7 +25,6 @@ const FLECHA_ABAJO = '<path d="M12 5v12m0 0-5-5m5 5 5-5" fill="none" stroke="cur
 const GUION = '<path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>';
 const CICLO = '<path d="M4 9a8 8 0 0 1 14-3m2-2v4h-4M20 15a8 8 0 0 1-14 3m-2 2v-4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
 
-/** Minigráfico anual (línea con área y punto final). */
 function Spark({ valores }: { valores: number[] }) {
   if (valores.length < 2) return null;
   const W = 240, H = 44, P = 4;
@@ -43,73 +43,84 @@ function Spark({ valores }: { valores: number[] }) {
   );
 }
 
+type Metrica = "conteo" | "tasa";
+
 interface Props {
   ranking: { etiqueta: string; delitos: Array<{ delito_id: string; nombre: string; cantidad: number; participacion: number }> };
   sn: SeriesNacionales;
-  completo?: boolean;
+  pob: PoblacionAnual;
 }
 
-export default function FranjaDelitos({ ranking, sn }: Props) {
+interface Ficha {
+  delito_id: string; nombre: string; participacion: number; rango: number; color: string; residual: boolean;
+  cantidad: number; tasaP: number | null; promMensual: number | null;
+  countAnnual: number[]; rateAnnual: number[];
+  a0: number | null; a1: number | null; cambioCount: number | null; cambioRate: number | null;
+}
+
+const chgPct = (arr: number[]) => arr.length >= 2 && arr[0] ? (arr.at(-1)! - arr[0]) / arr[0] * 100 : null;
+
+export default function FranjaDelitos({ ranking, sn, pob }: Props) {
+  const metrica = useEstado(s => s.metrica) as Metrica;
   const top10 = ranking.delitos.slice(0, 10);
   const esResidual = (n: string) => /^otros\b/i.test(n);
 
-  const tarjetas = top10.map((d, i) => {
+  const fichas: Ficha[] = top10.map((d, i) => {
     const serie = serieMensual(sn, d.delito_id);
     const anual = aAnual(serie).filter(a => a.v != null);
-    const valores = anual.map(a => a.v as number);
+    const countAnnual = anual.map(a => a.v as number);
+    const rateAnnual = anual.map(a => tasaAnual(a.v, a.anio, pob, null)).filter((x): x is number => x != null);
     const { suma, mesesPublicados } = acumulado(serie);
-    const promMensual = mesesPublicados ? suma / mesesPublicados : null;
-    let cambio: { pct: number | null; a0: number; a1: number } | null = null;
-    if (anual.length >= 2) {
-      const p = anual[0], u = anual.at(-1)!;
-      cambio = { pct: p.v ? ((u.v as number) - (p.v as number)) / (p.v as number) * 100 : null, a0: p.anio, a1: u.anio };
-    }
-    const dir = cambio?.pct == null ? "igual" : cambio.pct > 1 ? "alza" : cambio.pct < -1 ? "baja" : "igual";
-    return { ...d, rango: i, color: colorDelito(d.delito_id), valores, promMensual, cambio, dir, residual: esResidual(d.nombre) };
+    return {
+      delito_id: d.delito_id, nombre: d.nombre, participacion: d.participacion, rango: i,
+      color: colorDelito(d.delito_id), residual: esResidual(d.nombre),
+      cantidad: d.cantidad, tasaP: tasaPeriodo(serie, pob, null).tasa,
+      promMensual: mesesPublicados ? suma / mesesPublicados : null,
+      countAnnual, rateAnnual,
+      a0: anual[0]?.anio ?? null, a1: anual.at(-1)?.anio ?? null,
+      cambioCount: chgPct(countAnnual), cambioRate: chgPct(rateAnnual),
+    };
   });
+
+  const titulo = metrica === "tasa" ? "Los diez delitos por tasa /100 mil" : "Los diez delitos más frecuentes";
 
   return (
     <section className="seccion franja-delitos" id="panorama-delitos" aria-labelledby="t-franja">
       <p className="ni-eyebrow">Observatorio · Panorama nacional</p>
       <div className="seccion__head">
         <span className="seccion__num">◈</span>
-        <h2 id="t-franja">Los diez delitos más frecuentes</h2>
+        <h2 id="t-franja">{titulo}</h2>
       </div>
       <p className="seccion__desc">
-        Delitos registrados, {ranking.etiqueta}. Cada ficha se voltea: toca para ver cuánto cambió a lo largo del periodo,
-        su promedio mensual y su peso en el total. La frecuencia no equivale a gravedad.
+        {metrica === "tasa"
+          ? <>Tasa por cada 100 mil habitantes, {ranking.etiqueta} (denominador poblacional CONAPO). El orden coincide con el de volumen porque comparten el mismo denominador nacional.</>
+          : <>Delitos registrados, {ranking.etiqueta}. Cada ficha se voltea: toca para ver cuánto cambió a lo largo del periodo, su promedio mensual y su peso en el total. La frecuencia no equivale a gravedad.</>}
       </p>
       <div className="fd-strip" role="list">
-        {tarjetas.map(t => <TarjetaDelito key={t.delito_id} t={t} etiqueta={ranking.etiqueta} />)}
+        {fichas.map(f => <TarjetaDelito key={f.delito_id} f={f} etiqueta={ranking.etiqueta} metrica={metrica} />)}
       </div>
       <p className="nota fd-pie">
         Universo: nacional (fuente estatal) · {ranking.etiqueta} · elaboración propia con datos del SESNSP.
-        {tarjetas.some(t => t.residual) && " ⁽ᴿ⁾ categoría residual del catálogo oficial."}
+        {fichas.some(f => f.residual) && " ⁽ᴿ⁾ categoría residual del catálogo oficial."}
       </p>
     </section>
   );
 }
 
-function TarjetaDelito({ t, etiqueta }: {
-  t: { delito_id: string; nombre: string; cantidad: number; participacion: number; rango: number; color: string;
-       valores: number[]; promMensual: number | null; cambio: { pct: number | null; a0: number; a1: number } | null;
-       dir: string; residual: boolean };
-  etiqueta: string;
-}) {
+function TarjetaDelito({ f, etiqueta, metrica }: { f: Ficha; etiqueta: string; metrica: Metrica }) {
   const [volteada, setVolteada] = useState(false);
   const sceneRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
   const idDorso = useId();
   const voltear = () => setVolteada(v => !v);
 
-  // Inclinación 3D propia (respeta el conmutador global «Experiencia 3D» y el movimiento reducido).
   useEffect(() => {
     const scene = sceneRef.current, tilt = tiltRef.current;
     if (!scene || !tilt) return;
     const fino = matchMedia("(hover:hover) and (pointer:fine)").matches;
     const reducido = matchMedia("(prefers-reduced-motion:reduce)").matches;
     if (!fino || reducido) return;
-    const activo = () => document.documentElement.dataset.efectos === "cinematico";
+    const activo = () => document.documentElement.dataset.efectos !== "apagado";
     const mover = (e: PointerEvent) => {
       if (!activo()) { tilt.style.transform = ""; return; }
       const r = scene.getBoundingClientRect();
@@ -124,47 +135,57 @@ function TarjetaDelito({ t, etiqueta }: {
     return () => { scene.removeEventListener("pointermove", mover); scene.removeEventListener("pointerleave", salir); };
   }, []);
 
-  const icono = ICONOS[t.delito_id] ?? ICONO_FALLBACK;
-  const flecha = t.dir === "alza" ? FLECHA_ARRIBA : t.dir === "baja" ? FLECHA_ABAJO : GUION;
-  const trendTxt = t.cambio?.pct == null ? "s/d"
-    : `${fPct(t.cambio.pct)} (${t.cambio.a0}→${String(t.cambio.a1).slice(2)})`;
+  const esTasa = metrica === "tasa";
+  const cifra = esTasa ? fTasa(f.tasaP) : fEntero(f.cantidad);
+  const valores = esTasa ? f.rateAnnual : f.countAnnual;
+  const cambio = esTasa ? f.cambioRate : f.cambioCount;
+  const sub = esTasa
+    ? `por 100 mil hab. · ${etiqueta.replace("acumulado ", "")}`
+    : `${fPct(f.participacion, false)} del total · ${etiqueta.replace("acumulado ", "")}`;
+  const dir = cambio == null ? "igual" : cambio > 1 ? "alza" : cambio < -1 ? "baja" : "igual";
+
+  const icono = ICONOS[f.delito_id] ?? ICONO_FALLBACK;
+  const flecha = dir === "alza" ? FLECHA_ARRIBA : dir === "baja" ? FLECHA_ABAJO : GUION;
+  const trendTxt = cambio == null ? "s/d" : `${fPct(cambio)} (${f.a0}→${String(f.a1).slice(2)})`;
 
   return (
     <div className="fd-scene" role="listitem" ref={sceneRef}>
       <div className="fd-tilt" ref={tiltRef}>
-        <div className={`fd-card${volteada ? " es-volteada" : ""}`} style={{ ["--hue" as string]: t.color }}>
+        <div className={`fd-card${volteada ? " es-volteada" : ""}`} style={{ ["--hue" as string]: f.color }}>
           <div className="fd-flip">
             {/* Frente */}
             <div className="fd-cara fd-frente" role="button" tabIndex={0}
               aria-expanded={volteada} aria-controls={idDorso}
-              aria-label={`${t.nombre}. Voltear para ver el cambio en el periodo.`}
+              aria-label={`${f.nombre}. Voltear para ver el detalle.`}
               onClick={voltear}
               onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); voltear(); } }}>
               <div className="fd-top">
-                <span className="fd-rango">#{t.rango + 1}</span>
+                <span className="fd-rango">#{f.rango + 1}</span>
                 <span className="fd-ico" aria-hidden="true"><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: icono }} /></span>
-                <span className={`fd-trend fd-trend--${t.dir}`}>
+                <span className={`fd-trend fd-trend--${dir}`}>
                   <svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: flecha }} />{trendTxt}
                 </span>
               </div>
-              <h3 className="fd-nombre">{t.nombre}{t.residual ? " ⁽ᴿ⁾" : ""}</h3>
-              <p className="fd-cifra">{fEntero(t.cantidad)}</p>
-              <p className="fd-sub">{fPct(t.participacion, false)} del total · {etiqueta.replace("acumulado ", "")}</p>
-              <Spark valores={t.valores} />
+              <h3 className="fd-nombre">{f.nombre}{f.residual ? " ⁽ᴿ⁾" : ""}</h3>
+              <div className="fd-metrica" key={metrica}>
+                <p className="fd-cifra">{cifra}{esTasa && <span className="fd-u"> /100 mil</span>}</p>
+                <p className="fd-sub">{sub}</p>
+                <Spark valores={valores} />
+              </div>
               <span className="fd-cue" aria-hidden="true"><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: CICLO }} /> voltear</span>
             </div>
             {/* Dorso */}
             <div className="fd-cara fd-dorso" id={idDorso} aria-hidden={!volteada}>
-              <div className="fd-top"><span className="fd-rotulo">{t.nombre}</span>
+              <div className="fd-top"><span className="fd-rotulo">{f.nombre}</span>
                 <button className="fd-volver" onClick={voltear} tabIndex={volteada ? 0 : -1} aria-label="Volver">
                   <svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: CICLO }} /></button>
               </div>
               <dl className="fd-datos">
-                <div><dt>Cambio {t.cambio ? `${t.cambio.a0}→${t.cambio.a1}` : "en el periodo"}</dt>
-                  <dd className={`fd-cambio fd-trend--${t.dir}`}>{t.cambio?.pct == null ? "sin dato" : fPct(t.cambio.pct)}</dd></div>
-                <div><dt>Promedio mensual</dt><dd>{t.promMensual == null ? "s/d" : fEntero(Math.round(t.promMensual))}</dd></div>
-                <div><dt>Participación</dt><dd>{fPct(t.participacion, false)} del total nacional</dd></div>
-                <div><dt>Acumulado</dt><dd>{fCompacto(t.cantidad)} carpetas</dd></div>
+                <div><dt>Cambio {f.a0 ? `${f.a0}→${f.a1}` : "en el periodo"}</dt>
+                  <dd className={`fd-cambio fd-trend--${dir}`}>{cambio == null ? "sin dato" : fPct(cambio)}</dd></div>
+                <div><dt>Tasa del periodo</dt><dd>{fTasa(f.tasaP)} <span className="fd-u">/100 mil</span></dd></div>
+                <div><dt>Participación</dt><dd>{fPct(f.participacion, false)} del total nacional</dd></div>
+                <div><dt>Acumulado</dt><dd>{fCompacto(f.cantidad)} carpetas</dd></div>
               </dl>
               <a className="fd-detalle" href="#delitos"
                 onClick={e => { e.stopPropagation(); document.getElementById("delitos")?.scrollIntoView({ behavior: "smooth" }); }}

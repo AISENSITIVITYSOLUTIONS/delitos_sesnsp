@@ -284,3 +284,15 @@ table.datos th.no-imprimir, table.datos td.no-imprimir { white-space: nowrap; wi
 .fx-modo{ font-size:12px; font-weight:600; color:var(--acento); letter-spacing:.01em;
   background:color-mix(in srgb, var(--acento) 14%, transparent);
   border:1px solid color-mix(in srgb, var(--acento) 32%, transparent); border-radius:999px; padding:4px 12px; }
+
+/* ═══ Métrica conmutable (Cantidad ↔ Tasa) con transición cinemática ═══ */
+.fd-metrica{ margin-top:auto; display:flex; flex-direction:column; gap:6px;
+  animation:fd-metrica-in .5s cubic-bezier(.2,.75,.2,1) both; }
+.fd-frente .fd-metrica .fd-cifra{ margin-top:0; }
+.fd-u{ font-size:13px; font-weight:500; color:var(--ink-2); letter-spacing:0; }
+.fd-cambio .fd-u{ font-size:13px; }
+@keyframes fd-metrica-in{
+  from{ opacity:0; transform:translateY(10px) scale(.985); filter:blur(2px); }
+  to{ opacity:1; transform:none; filter:blur(0); }
+}
+@media(prefers-reduced-motion:reduce){ .fd-metrica{ animation:none; } }
