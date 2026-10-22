@@ -146,3 +146,122 @@ html[data-efectos=apagado] .hz-flip{ transition:none; }
 html[data-efectos=apagado] .fd-flip{ transition:none; }
 @media(prefers-reduced-motion:reduce){ html:not([data-efectos=cinematico]) .fd-flip{ transition:none; } .fd-tilt{ transition:none; } }
 @media print{ .fd-flip{ transform:none!important; } .fd-cara{ position:static; -webkit-backface-visibility:visible; backface-visibility:visible; box-shadow:none; } .fd-dorso{ transform:none; margin-top:10px; } .fd-cue,.fd-volver{ display:none!important; } }
+
+/* ╔══════════════════════════════════════════════════════════════════════╗
+   ║  REDISEÑO PREMIUM INTEGRAL — sistema coherente de tipografía,          ║
+   ║  superficie, profundidad y detalle. Preserva la paleta validada        ║
+   ║  (CVD/contraste), las gráficas ECharts/deck.gl y los efectos 3D.       ║
+   ╚══════════════════════════════════════════════════════════════════════╝ */
+
+/* 1 · Tipografía editorial — devuelve el serif a los títulos (gravedad institucional) */
+.seccion__head h2, .ni-lab-head h2, .encabezado__titulo, #hallazgos .seccion__head h2 {
+  font-family: var(--serif); letter-spacing: -0.015em; font-weight: 600;
+}
+.seccion__head h2, .ni-lab-head h2 { font-size: clamp(21px, 2.6vw, 27px); line-height: 1.12; }
+
+/* 2 · Ritmo y cabecera de sección refinada */
+.seccion { padding: 38px 0 6px; }
+.seccion__head { align-items: center; gap: 13px; margin-bottom: 12px; }
+.seccion__desc { font-size: 14px; line-height: 1.6; max-width: 72ch; color: var(--ink-2); margin-top: 6px; }
+.ni-eyebrow, .impacto-eyebrow {
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600;
+  color: var(--acento); margin-bottom: 6px;
+}
+.seccion__num {
+  font-family: var(--mono); font-size: 11.5px; font-weight: 500; letter-spacing: 0.04em;
+  color: var(--acento); background: color-mix(in srgb, var(--acento) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--acento) 30%, transparent); border-radius: 8px;
+  padding: 4px 9px; box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink-inv) 10%, transparent);
+}
+
+/* 3 · Lenguaje de tarjeta unificado — profundidad discreta y consistente */
+.tarjeta { border-radius: 14px; }
+.tarjeta, .ni-preguntas a, .impacto-kpis article, .resumen-grid > article, .impacto-panel {
+  border-radius: 14px;
+}
+:root[data-theme="dark"] .tarjeta,
+:root[data-theme="dark"] .impacto-panel {
+  background: linear-gradient(162deg, #1d2e3c, #15232f 72%);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.045), 0 1px 2px rgba(0,0,0,0.28), 0 16px 34px -22px rgba(0,0,0,0.6);
+}
+.tarjeta--alzable { transition: transform .22s cubic-bezier(.2,.7,.2,1), box-shadow .22s; }
+.tarjeta--alzable:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 22px 44px -22px rgba(0,0,0,0.62); }
+
+/* 4 · Tarjetas de investigación (01–05) — mismo idioma que la franja hero */
+.ni-preguntas { gap: 14px; }
+.ni-preguntas a {
+  display: flex; flex-direction: column; gap: 7px; padding: 16px 16px 15px; min-width: 0;
+  border: 1px solid var(--border); border-top: 2px solid color-mix(in srgb, var(--acento) 55%, transparent);
+  background: linear-gradient(168deg, var(--surface-2), var(--surface) 74%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 30px -22px rgba(0,0,0,0.5);
+  transition: transform .2s cubic-bezier(.2,.7,.2,1), box-shadow .2s, border-color .2s; text-decoration: none;
+}
+.ni-preguntas a:hover { transform: translateY(-3px); border-top-color: var(--acento);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 20px 42px -20px rgba(0,0,0,0.6); text-decoration: none; }
+.ni-preguntas a > span {
+  font-family: var(--serif); font-weight: 600; font-size: 17px; color: var(--acento);
+  letter-spacing: -0.02em; line-height: 1;
+}
+.ni-preguntas a > strong { font-size: 15px; font-weight: 650; color: var(--ink); line-height: 1.25; letter-spacing: -0.01em; }
+.ni-preguntas a > small { margin-top: auto; font-size: 12px; color: var(--ink-3); font-weight: 500; }
+
+/* 5 · Tiles KPI — cifra en serif, etiqueta discreta */
+.impacto-kpis article > strong { font-family: var(--serif); letter-spacing: -0.02em; }
+
+/* 6 · Tablas premium — sin cortes, números alineados, jerarquía clara */
+table.datos { font-size: 13px; }
+table.datos th {
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3);
+  border-bottom: 1px solid var(--border-strong); padding: 10px 12px; font-weight: 600;
+}
+table.datos td { padding: 9px 12px; border-bottom: 1px solid var(--grid); }
+table.datos td.num, table.datos th.num { font-variant-numeric: tabular-nums; }
+table.datos a, .impacto-tabla a, td a.boton, .mini-accion { white-space: nowrap; }
+table.datos tbody tr { transition: background .14s; }
+table.datos tbody tr:hover td { background: color-mix(in srgb, var(--acento) 7%, transparent); }
+
+/* 7 · Encabezado — clúster de estado y control de tema refinados */
+.estado-lista {
+  background: color-mix(in srgb, var(--ink-inv) 0%, rgba(255,255,255,0.03));
+  background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 13px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.estado-lista dt { letter-spacing: 0.1em; }
+.tema-btn { border-radius: 11px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08); transition: background .18s, transform .18s; }
+.tema-btn:hover { transform: translateY(-1px); }
+.encabezado__sello { border-radius: 13px; }
+
+/* 8 · Navegación lateral — marcadores y estado activo refinados */
+.encabezado__nav a { border-radius: 8px; transition: background .16s, color .16s; letter-spacing: -0.005em; }
+@media (min-width: 1200px) {
+  .encabezado__nav a { border-bottom: 0; padding: 9px 12px; margin: 1px 0; }
+  .encabezado__nav a:hover { background: color-mix(in srgb, var(--acento) 14%, transparent); color: var(--ink); }
+}
+
+/* 9 · Controles — segmentado, botones y selects con profundidad discreta */
+.seg { border-radius: 11px; }
+.seg button { border-radius: 8px; }
+.boton, select.control, input.control { border-radius: 9px; transition: background .16s, box-shadow .16s, border-color .16s; }
+.boton:hover { transform: translateY(-1px); }
+.chip { border-radius: 999px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
+
+/* 10 · Profundidad ambiental del lienzo (sutil, nunca centelleante) */
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(1100px 620px at 82% -6%, rgba(99,187,255,0.06), transparent 58%),
+    radial-gradient(900px 560px at -4% 2%, rgba(128,203,190,0.05), transparent 55%),
+    var(--page);
+  background-attachment: fixed;
+}
+
+/* Afinados responsivos */
+@media (max-width: 760px) {
+  .seccion { padding: 26px 0 4px; }
+  .ni-preguntas a { padding: 14px; }
+}
+
+/* 6b · Corrección de ajuste en tablas: números y acciones nunca se parten */
+table.datos td.num, table.datos th.num { white-space: nowrap; }
+table.datos button, table.datos .ver-calculo, table.datos .boton { white-space: nowrap; }
+table.datos th.no-imprimir, table.datos td.no-imprimir { white-space: nowrap; width: 1%; }
