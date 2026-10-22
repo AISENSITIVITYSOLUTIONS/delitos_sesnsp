@@ -11,6 +11,11 @@ const ICONOS: Record<string, string> = {
   "otros-delitos-del-fuero-comun": '<path d="M12 4 20 8l-8 4-8-4 8-4Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M4 12l8 4 8-4M4 16l8 4 8-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
   "robo-de-vehiculo-automotor": '<path d="M3 13l2-5h11l3 3h2v4h-3M3 13v3h2m0 0a2 2 0 1 0 4 0m-4 0a2 2 0 1 1 4 0m7 0a2 2 0 1 0 4 0m-4 0a2 2 0 1 1 4 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
   "lesiones-dolosas": '<path d="M3 12h4l2-5 4 10 2-5h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+  "dano-a-la-propiedad": '<path d="M4 20V9l8-5 8 5v11M4 20h16M9 20v-5h6v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.5 8.5l-2 3h2l-1.5 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>',
+  "amenazas": '<path d="M12 3 3 7v5c0 5 3.8 8 9 9 5.2-1 9-4 9-9V7l-9-4Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 8v4.5M12 15.5v.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+  "robo-a-negocio": '<path d="M4 10l1.5-4h13L20 10M4 10v9h16v-9M4 10h16M9 19v-5h6v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
+  "fraude": '<path d="M4 7h16v10H4z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 10h16" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="14" r="1.3" fill="currentColor"/><path d="M13 14h4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+  "robo-a-transeunte-en-via-publica": '<circle cx="12" cy="5.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 21v-6l-2-3 3-3h4l3 3-2 3v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
 };
 const ICONO_FALLBACK = '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v5l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>';
 
@@ -45,10 +50,10 @@ interface Props {
 }
 
 export default function FranjaDelitos({ ranking, sn }: Props) {
-  const top5 = ranking.delitos.slice(0, 5);
+  const top10 = ranking.delitos.slice(0, 10);
   const esResidual = (n: string) => /^otros\b/i.test(n);
 
-  const tarjetas = top5.map((d, i) => {
+  const tarjetas = top10.map((d, i) => {
     const serie = serieMensual(sn, d.delito_id);
     const anual = aAnual(serie).filter(a => a.v != null);
     const valores = anual.map(a => a.v as number);
@@ -65,12 +70,13 @@ export default function FranjaDelitos({ ranking, sn }: Props) {
 
   return (
     <section className="seccion franja-delitos" id="panorama-delitos" aria-labelledby="t-franja">
+      <p className="ni-eyebrow">Observatorio · Panorama nacional</p>
       <div className="seccion__head">
         <span className="seccion__num">◈</span>
-        <h2 id="t-franja">Los cinco delitos más frecuentes</h2>
+        <h2 id="t-franja">Los diez delitos más frecuentes</h2>
       </div>
       <p className="seccion__desc">
-        Delitos registrados, {ranking.etiqueta}. Cada tarjeta se voltea: toca para ver cuánto cambió a lo largo del periodo,
+        Delitos registrados, {ranking.etiqueta}. Cada ficha se voltea: toca para ver cuánto cambió a lo largo del periodo,
         su promedio mensual y su peso en el total. La frecuencia no equivale a gravedad.
       </p>
       <div className="fd-strip" role="list">

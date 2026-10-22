@@ -3,7 +3,6 @@ import Efectos3D from "./components/Efectos3D";
 import TerritorioImpacto from "./components/TerritorioImpacto";
 import AltoImpacto from "./components/AltoImpacto";
 import Resumen from "./components/Resumen";
-import PreguntasInvestigacion from './components/PreguntasInvestigacion';
 import Laboratorio from "./components/Laboratorio";
 import FranjaDelitos from "./components/FranjaDelitos";
 import { useEffect, useMemo, useState } from "react";
@@ -188,7 +187,6 @@ export default function App() {
       </div>
 
       <main id="contenido" className="contenedor">
-        <PreguntasInvestigacion />
         <FranjaDelitos ranking={ranking} sn={sn} />
         <TerritorioImpacto estatal={datos.estatal} sn={datos.nacionalNM} pob={datos.pob}/>
         <AltoImpacto nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} />
