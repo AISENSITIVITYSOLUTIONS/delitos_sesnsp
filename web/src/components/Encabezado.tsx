@@ -51,6 +51,7 @@ export default function Encabezado({ manifiesto }: { manifiesto: Manifiesto | nu
       <nav id="navegacion" className={`encabezado__nav no-imprimir ${menu ? "menu-abierto" : ""}`} aria-label="Secciones" onClick={e=>{if((e.target as HTMLElement).closest("a"))setMenu(false);}}>
         <div className="sidebar-brand"><a className="sidebar-logo" href="https://www.nni.ai/" target="_blank" rel="noreferrer" aria-label="Neural Network Initiative (abre www.nni.ai)"><img src={logoNni} srcSet={`${logoNni} 1x, ${logoNniGrande} 2x`} width={56} height={56} alt="" /></a><div>OBSERVATORIO<br />DE INCIDENCIA DELICTIVA<small>MÉXICO</small></div></div>
         <div className="contenedor">
+          <a href="#explorador">◎ Atlas territorial 3D</a>
           <a href="#panorama-delitos">◈ Delitos más frecuentes</a>
           <a href="#territorio-impacto">◇ Cambio territorial</a>
           <a href="#alto-impacto">◈ Comparar delitos</a>

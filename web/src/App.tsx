@@ -188,6 +188,20 @@ export default function App() {
       </div>
 
       <main id="contenido" className="contenedor">
+        <section className="seccion" id="explorador" aria-labelledby="t-explorador">
+          <div className="seccion__head">
+            <span className="seccion__num">ATLAS</span>
+            <h2 id="t-explorador">Atlas territorial · exploración inmersiva</h2>
+          </div>
+          <p className="seccion__desc">
+            Cartografía oficial compatible con las claves del INEGI. Alterna entre conteos y tasas y entre
+            la vista plana y la extrusión 3D; el cero reportado y la ausencia de información se distinguen
+            visualmente. El atlas ofrece filtros anuales propios y conserva el explorador clásico.
+          </p>
+          <Explorador estatal={datos.estatal} municipal={datos.municipal} pob={datos.pob}
+            aniosVisibles={aniosVisibles}
+            etiquetaPeriodo={aniosVisibles.length ? `${aniosVisibles[0]}–${aniosVisibles.at(-1)}` : ""} />
+        </section>
         <FranjaDelitos ranking={ranking} sn={sn} pob={datos.pob} />
         <Victimas />
         <TerritorioImpacto estatal={datos.estatal} sn={datos.nacionalNM} pob={datos.pob}/>
@@ -245,20 +259,7 @@ export default function App() {
           />
         </section>
 
-        <section className="seccion" id="explorador" aria-labelledby="t-explorador">
-          <div className="seccion__head">
-            <span className="seccion__num">04</span>
-            <h2 id="t-explorador">Explorador territorial</h2>
-          </div>
-          <p className="seccion__desc">
-            Cartografía oficial compatible con las claves del INEGI. Alterna entre conteos y tasas y entre
-            la vista plana y la extrusión 3D; el cero reportado y la ausencia de información se distinguen
-            visualmente. Los enlaces de esta página conservan tu selección.
-          </p>
-          <Explorador estatal={datos.estatal} municipal={datos.municipal} pob={datos.pob}
-            aniosVisibles={aniosVisibles}
-            etiquetaPeriodo={aniosVisibles.length ? `${aniosVisibles[0]}–${aniosVisibles.at(-1)}` : ""} />
-        </section>
+
 
         <section className="seccion" id="metodologia" aria-labelledby="t-metodologia">
           <div className="seccion__head">
