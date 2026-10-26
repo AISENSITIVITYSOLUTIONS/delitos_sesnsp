@@ -190,7 +190,6 @@ export default function App() {
       <main id="contenido" className="contenedor">
         <FranjaDelitos ranking={ranking} sn={sn} pob={datos.pob} />
         <Victimas />
-        <TerritorioImpacto estatal={datos.estatal} sn={datos.nacionalNM} pob={datos.pob}/>
         <AltoImpacto nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} />
         <Laboratorio nm={datos.nacionalNM} nr={datos.nacionalNR} pob={datos.pob} estatal={datos.estatal} municipal={datos.municipal} manifiesto={m}/>
         <section className="seccion" id="hallazgos" aria-labelledby="t-hallazgos">
@@ -245,6 +244,7 @@ export default function App() {
           />
         </section>
 
+        <TerritorioImpacto estatal={datos.estatal} sn={datos.nacionalNM} pob={datos.pob}/>
         <section className="seccion" id="explorador" aria-labelledby="t-explorador">
           <div className="seccion__head">
             <span className="seccion__num">04</span>

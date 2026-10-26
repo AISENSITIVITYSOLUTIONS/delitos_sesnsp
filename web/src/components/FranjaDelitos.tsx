@@ -4,6 +4,7 @@ import { serieMensual, aAnual, acumulado, tasaPeriodo, tasaAnual } from "../lib/
 import { colorDelito } from "../theme/paleta";
 import { fEntero, fCompacto, fPct, fTasa } from "../lib/formato";
 import { useEstado } from "../lib/estado";
+import Escenario3D from "./Escenario3D";
 
 /** Íconos de trazo por delito (genéricos, sin color propio). */
 const ICONOS: Record<string, string> = {
@@ -94,6 +95,7 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
     return () => clearInterval(id);
   }, []);
 
+  const [seleccion, setSeleccion] = useState<string | null>(null);
   const titulo = metrica === "tasa" ? "Los diez delitos por tasa /100 mil" : "Los diez delitos más frecuentes";
 
   return (
@@ -108,6 +110,11 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
           ? <>Tasa por cada 100 mil habitantes, {ranking.etiqueta} (denominador poblacional CONAPO). El orden coincide con el de volumen porque comparten el mismo denominador nacional.</>
           : <>Delitos registrados, {ranking.etiqueta}. Cada ficha se voltea: toca para ver cuánto cambió a lo largo del periodo, su promedio mensual y su peso en el total. La frecuencia no equivale a gravedad.</>}
       </p>
+      <Escenario3D
+        items={fichas.map(f => ({ id: f.delito_id, etiqueta: f.nombre, valor: metrica === "tasa" ? (f.tasaP ?? 0) : f.cantidad, color: f.color }))}
+        modo="barras" seleccion={seleccion} onSeleccion={setSeleccion}
+        ariaLabel="Diez delitos más frecuentes, barras 3D"
+        formatear={v => metrica === "tasa" ? `${fTasa(v)} por 100 mil` : fEntero(v)} />
       <div className="fd-strip" role="list"
         onPointerEnter={() => { pausaRef.current = true; }} onPointerLeave={() => { pausaRef.current = false; }}
         onFocusCapture={() => { pausaRef.current = true; }} onBlurCapture={() => { pausaRef.current = false; }}>

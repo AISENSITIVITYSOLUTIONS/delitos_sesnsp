@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { clase, marcoDe, mercX, mercY } from '../lib/geo';
+import { marcoDe, mercX, mercY } from '../lib/geo';
 import type { Territorio } from '../lib/geo';
 import type { ValorTerritorio } from './MapaMx';
 import './mapa-three.css';
@@ -11,7 +11,7 @@ export interface VistaThree { posicion: number[]; objetivo: number[]; territorio
 interface Props {
   territorios: Territorio[]; valores: Record<string, ValorTerritorio>;
   rampa: readonly string[]; cortes: number[]; maxV: number;
-  metrica: 'conteo' | 'tasa'; onSeleccion?: (cve: string) => void;
+  metrica: 'conteo' | 'tasa'; onSeleccion?: (cve: string) => void; colorDe: (cve: string) => string;
   onFallo: () => void; seleccionado?: string | null;
   vistaGuardada?: VistaThree; onVista?: (v: VistaThree) => void;
   fmt: (v: number | null) => string;
@@ -38,7 +38,7 @@ export default function Mapa3D(p: Props) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.setClearColor(0x000000, 0);
     node.appendChild(renderer.domElement);
-    renderer.domElement.setAttribute('aria-label', 'Mapa territorial Three.js. Arrastra para rotar; usa la rueda para acercar. La selección por teclado está debajo del mapa.');
+    renderer.domElement.setAttribute('aria-label', 'Mapa territorial 3D. Arrastra para rotar; usa la rueda para acercar. La selección por teclado está debajo del mapa.');
     const territorio = p.territorios.map(t => t.cve).join(",");
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 2500);
@@ -92,7 +92,7 @@ export default function Mapa3D(p: Props) {
         const v = q.valores[mesh.userData.cve]?.v ?? null;
         mesh.userData.valor = v;
         mesh.scale.y = v == null || q.maxV <= 0 ? 0.12 : Math.max(0.12, Math.max(0, v) / q.maxV * 24 * configuracion.current.relieve);
-        mesh.material.color.set(v == null ? '#8c8c87' : v === 0 ? '#e2e8f0' : q.rampa[Math.min(clase(v, q.cortes), q.rampa.length - 1)]);
+        mesh.material.color.set(q.colorDe(mesh.userData.cve));
         mesh.material.emissive.set(mesh.userData.cve === q.seleccionado ? '#2563eb' : '#000000');
         mesh.material.emissiveIntensity = 0.35;
         mesh.material.wireframe = configuracion.current.malla;
@@ -142,7 +142,7 @@ export default function Mapa3D(p: Props) {
   }, [p.territorios]);
   const actual = hover ? p.valores[hover.cve]?.v ?? null : null;
   return <div className="three-dashboard">
-    <div className="three-heading"><span className="three-badge">EXPLORACIÓN TERRITORIAL · VISTA 3D</span><p>Arrastra para rotar · Desplaza para acercar · Selecciona un territorio</p></div>
+    <div className="three-heading"><span className="three-badge">EXPLORACIÓN TERRITORIAL · 3D</span><p>Arrastra para rotar · Desplaza para acercar · Selecciona un territorio</p></div>
     <div className="three-viewport" ref={host} />
     {hover && <div className="three-tooltip" role="status"><strong>{hover.nombre}</strong><span>{p.fmt(actual)}</span><small>Clave territorial {hover.cve}</small></div>}
     <div className="three-toolbar" role="group" aria-label="Controles de cámara 3D">

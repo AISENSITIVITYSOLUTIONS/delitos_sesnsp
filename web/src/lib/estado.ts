@@ -4,7 +4,6 @@ import { create } from "zustand";
 
 export type Metrica = "conteo" | "tasa";
 export type Tramo = "2015-2025" | "2026" | "completo";
-export type Vista3D = "2d" | "3d";
 
 export interface Filtros {
   tramo: Tramo;
@@ -17,7 +16,6 @@ export interface Filtros {
   delitoId: string | null;      // null = todos los delitos
   comparacion: string[];        // hasta 5 claves de territorio (ent o mun)
   umbralPoblacion: number;      // filtro municipal visible y modificable
-  vistaMapa: Vista3D;
 }
 
 interface Estado extends Filtros {
@@ -35,7 +33,6 @@ export const FILTROS_INICIALES: Filtros = {
   delitoId: null,
   comparacion: [],
   umbralPoblacion: 0,
-  vistaMapa: "2d",
 };
 
 const aHash = (f: Filtros): string => {
@@ -49,7 +46,6 @@ const aHash = (f: Filtros): string => {
   if (f.delitoId) p.set("del", f.delitoId);
   if (f.comparacion.length) p.set("c", f.comparacion.join("."));
   if (f.umbralPoblacion) p.set("u", String(f.umbralPoblacion));
-  if (f.vistaMapa !== "2d") p.set("v", f.vistaMapa);
   const s = p.toString();
   return s ? `#${s}` : "";
 };
@@ -68,7 +64,6 @@ const deHash = (): Partial<Filtros> => {
     const del = p.get("del"); if (del && del.length < 80) f.delitoId = del;
     const c = p.get("c"); if (c) f.comparacion = c.split(".").filter(x => /^\d{2}(\d{3})?$/.test(x)).slice(0, 5);
     const u = p.get("u"); if (u && /^\d+$/.test(u)) f.umbralPoblacion = Math.min(+u, 1_000_000);
-    if (p.get("v") === "3d") f.vistaMapa = "3d";
     return f;
   } catch { return {}; }
 };

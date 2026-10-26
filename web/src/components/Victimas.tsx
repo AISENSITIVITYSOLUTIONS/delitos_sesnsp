@@ -1,6 +1,13 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { cargar } from "../lib/datos";
 import { fEntero, fCompacto } from "../lib/formato";
+import Escenario3D from "./Escenario3D";
+
+/** Color de una variable CSS en hexadecimal, o un respaldo si no es hex. */
+const colorVar = (nombre: string, respaldo: string) => {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(nombre).trim();
+  return /^#[0-9a-f]{3,8}$/i.test(v) ? v : respaldo;
+};
 
 interface DelitoVic {
   id: string; nombre: string; total: number;
@@ -20,6 +27,7 @@ const CICLO = '<path d="M4 9a8 8 0 0 1 14-3m2-2v4h-4M20 15a8 8 0 0 1-14 3m-2 2v-
 
 export default function Victimas() {
   const [d, setD] = useState<Datos | null>(null);
+  const [seleccion, setSeleccion] = useState<string | null>(null);
   useEffect(() => { cargar<Datos>("victimas.json").then(setD).catch(() => setD(null)); }, []);
 
   const filas = useMemo(() => {
@@ -50,6 +58,18 @@ export default function Victimas() {
         <span className="vz-li"><i className="vz-sw vz-sw--ni" /> No identificado</span>
       </div>
 
+      <Escenario3D
+        items={filas.map(f => ({
+          id: f.id, etiqueta: f.nombre, valor: f.total, color: colorVar("--vz-muj", "#c2410c"),
+          partes: [
+            { valor: f.pct_mujer ?? 0, color: colorVar("--vz-muj", "#c2410c") },
+            { valor: f.pct_hombre ?? 0, color: colorVar("--vz-hom", "#0e7490") },
+            { valor: Math.max(0, 100 - (f.pct_mujer ?? 0) - (f.pct_hombre ?? 0)), color: colorVar("--vz-ni", "#94a3b8") },
+          ],
+        }))}
+        modo="anillos" seleccion={seleccion} onSeleccion={setSeleccion}
+        ariaLabel="Composición por sexo de las víctimas, anillos 3D"
+        formatear={v => `${fEntero(v)} víctimas`} />
       <div className="fd-strip" role="list">
         {filas.map(f => <TarjetaVictima key={f.id} f={f} />)}
       </div>

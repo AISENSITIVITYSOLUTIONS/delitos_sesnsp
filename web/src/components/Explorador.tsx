@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import MapaMx, { soportaWebGL, type ValorTerritorio } from "./MapaMx";
+import MapaMx, { type ValorTerritorio } from "./MapaMx";
 import Grafica, { tokens } from "./Grafica";
 import type { EstatalAnual, MunicipalAnual, PoblacionAnual } from "../lib/contratos";
 import type { GeoColeccion, Territorio } from "../lib/geo";
@@ -70,19 +70,13 @@ function ComposicionMunicipio({ cveMun, municipal, aniosVisibles, etiquetaPeriod
 }
 
 export default function Explorador({ estatal, municipal, pob, aniosVisibles, etiquetaPeriodo }: Props) {
-  const { metrica, cveEnt, cveMun, vistaMapa, comparacion, set } = useEstado();
+  const { metrica, cveEnt, cveMun, comparacion, set } = useEstado();
   const [geoEdos, setGeoEdos] = useState<Territorio[] | null>(null);
   const [geoMun, setGeoMun] = useState<Territorio[] | null>(null);
   const t = tokens();
 
   useEffect(() => {
     cargar<GeoColeccion>("geo/estados.json").then(g => setGeoEdos(g.territorios)).catch(() => setGeoEdos([]));
-    // El 3D es la vista de arranque cuando el dispositivo lo soporta y el
-    // enlace no trae una preferencia explícita; el cambio a 2D es inmediato.
-    if (soportaWebGL && !window.location.hash.includes("v=") &&
-        !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      set({ vistaMapa: "3d" });
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
@@ -223,8 +217,6 @@ export default function Explorador({ estatal, municipal, pob, aniosVisibles, eti
           valores={valores}
           metrica={metrica}
           titulo={tituloUniverso}
-          modo={vistaMapa}
-          onModo={(m) => set({ vistaMapa: m })}
           seleccionado={cveMun}
           onSeleccion={(cve) => {
             if (!nivelMunicipal) set({ cveEnt: cve, cveMun: null });
