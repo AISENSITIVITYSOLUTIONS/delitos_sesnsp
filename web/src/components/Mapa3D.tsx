@@ -1,157 +1,158 @@
-/** Vista 3D: extrusión de polígonos con deck.gl (sin mapa base externo).
- * La altura representa la métrica activa (explícita en la leyenda del
- * contenedor). Controles: inclinación, rotación, restablecer; el cambio a 2D
- * es inmediato desde el conmutador del contenedor. */
-import { useCallback, useEffect, useMemo, useState, useRef } from "react";
-import DeckGL from "@deck.gl/react";
-import { PolygonLayer } from "@deck.gl/layers";
-import { AmbientLight, DirectionalLight, LightingEffect, MapView, LinearInterpolator } from "@deck.gl/core";
-import type { PickingInfo, MapViewState } from "@deck.gl/core";
-import type { Territorio } from "../lib/geo";
-import { clase } from "../lib/geo";
-import type { ValorTerritorio } from "./MapaMx";
+/** Escena Three.js con coordenadas Mercator locales y extrusión lineal. */
+import { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { clase, marcoDe, mercX, mercY } from '../lib/geo';
+import type { Territorio } from '../lib/geo';
+import type { ValorTerritorio } from './MapaMx';
+import './mapa-three.css';
 
+export interface VistaThree { posicion: number[]; objetivo: number[]; territorio: string }
 interface Props {
-  territorios: Territorio[];
-  valores: Record<string, ValorTerritorio>;
-  rampa: readonly string[];
-  cortes: number[];
-  maxV: number;
-  metrica: "conteo" | "tasa";
-  onSeleccion?: (cve: string) => void;
-  onFallo: () => void;
-  seleccionado?: string | null;
-  vistaGuardada?: MapViewState;
-  onVista?: (v:MapViewState)=>void;
+  territorios: Territorio[]; valores: Record<string, ValorTerritorio>;
+  rampa: readonly string[]; cortes: number[]; maxV: number;
+  metrica: 'conteo' | 'tasa'; onSeleccion?: (cve: string) => void;
+  onFallo: () => void; seleccionado?: string | null;
+  vistaGuardada?: VistaThree; onVista?: (v: VistaThree) => void;
   fmt: (v: number | null) => string;
 }
-
-function vistaInicial(territorios: Territorio[]): MapViewState {
-  let minLon = Infinity, maxLon = -Infinity, minLat = Infinity, maxLat = -Infinity;
-  for (const t of territorios) for (const an of t.pols) for (const [lon, lat] of an) {
-    if (lon < minLon) minLon = lon; if (lon > maxLon) maxLon = lon;
-    if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
-  }
-  if (!isFinite(minLon)) return { longitude: -102.2, latitude: 23.8, zoom: 4.15, pitch: 46, bearing: -12, minZoom: 3.2, maxZoom: 10, maxPitch: 70 };
-  const dLon = Math.max(maxLon - minLon, 0.2), dLat = Math.max(maxLat - minLat, 0.2);
-  const zoom = Math.min(Math.max(Math.log2(300 / Math.max(dLon, dLat * 1.5)) , 3.4), 8.6);
-  return {
-    longitude: (minLon + maxLon) / 2, latitude: (minLat + maxLat) / 2 - dLat * 0.06,
-    zoom, pitch: 46, bearing: -12, minZoom: 3.2, maxZoom: 10, maxPitch: 70,
-  };
-}
-
-const hexARgb = (hex: string): [number, number, number] => {
-  const h = hex.replace("#", "");
-  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
-};
-
+type Pieza = THREE.Mesh<THREE.ExtrudeGeometry, THREE.MeshStandardMaterial>;
 export default function Mapa3D(p: Props) {
-  const contenedor=useRef<HTMLDivElement>(null);
-  const [calidad,setCalidad]=useState(1);
-  const [modo,setModo]=useState(document.documentElement.dataset.efectos??'estandar');
-  const [activo,setActivo]=useState(true);
-  useEffect(()=>{let visible=true;const actualizar=()=>setActivo(visible&&!document.hidden);const obs=new IntersectionObserver(([e])=>{visible=e.isIntersecting;actualizar();},{rootMargin:'100px'});if(contenedor.current)obs.observe(contenedor.current);document.addEventListener('visibilitychange',actualizar);actualizar();return()=>{obs.disconnect();document.removeEventListener('visibilitychange',actualizar);};},[]);
-  useEffect(()=>{
-    const node=contenedor.current;
-    const perdido=(event:Event)=>{event.preventDefault();p.onFallo();};
-    node?.addEventListener("webglcontextlost",perdido,true);
-    const ajustar=()=>{setModo(document.documentElement.dataset.efectos??'estandar');const n=navigator as Navigator & {deviceMemory?:number};const limitada=matchMedia("(pointer:coarse)").matches||(n.deviceMemory!=null&&n.deviceMemory<=4)||navigator.hardwareConcurrency<=4;setCalidad(document.documentElement.dataset.efectos==="cinematico"&&!limitada?Math.min(devicePixelRatio||1,1.5):1);};
-    ajustar();const obs=new MutationObserver(ajustar);obs.observe(document.documentElement,{attributes:true,attributeFilter:["data-efectos"]});window.addEventListener("resize",ajustar);
-    return()=>{node?.removeEventListener("webglcontextlost",perdido,true);obs.disconnect();window.removeEventListener("resize",ajustar);};
-  },[p.onFallo]);
-  const luces = useMemo(() => [new LightingEffect({
-    ambiente: new AmbientLight({ color: [215, 232, 255], intensity: 0.8 }),
-    principal: new DirectionalLight({ color: [215, 232, 255], intensity: 0.85, direction: [-2, -3, -4] }),
-    relleno: new DirectionalLight({ color: [215, 232, 255], intensity: 0.25, direction: [3, 1, -2] }),
-  })], []);
-  const [malla, setMalla] = useState(false);
-  const [ortografica, setOrtografica] = useState(false);
+  const host = useRef<HTMLDivElement>(null);
+  const latest = useRef(p); latest.current = p;
+  const acciones = useRef<(accion: string) => void>(() => {});
   const [relieve, setRelieve] = useState(1);
-  const inicial = useMemo(() => vistaInicial(p.territorios), [p.territorios]);
-  const [vista, setVista] = useState<MapViewState>(p.vistaGuardada??inicial);
-  useEffect(() => { setVista(p.vistaGuardada??inicial); }, [inicial]);
-  useEffect(()=>{p.onVista?.(vista);},[vista,p.onVista]);
-  const reducirMovimiento = !activo || modo === "apagado";
+  const [plana, setPlana] = useState(false);
+  const [malla, setMalla] = useState(false);
+  const [hover, setHover] = useState<{ nombre: string; cve: string; valor: number | null } | null>(null);
+  const actualizar = useRef<() => void>(() => {});
+  const configuracion = useRef({ relieve, malla }); configuracion.current = { relieve, malla };
+  useEffect(() => { actualizar.current(); }, [p.valores, p.rampa, p.cortes, p.maxV, p.seleccionado, relieve, malla]);
 
-  const datos = useMemo(() => p.territorios.map(t => {
-    const d = p.valores[t.cve];
-    return { ...t, valor: d?.v ?? null };
-  }), [p.territorios, p.valores]);
-
-  const escalaAltura = p.maxV > 0 ? 320_000 * relieve / p.maxV : 0;
-
-  const capa = useMemo(() => new PolygonLayer({
-    id: "territorios-3d",
-    data: datos,
-    getPolygon: (d: (typeof datos)[number]) => d.pols,
-    extruded: true,
-    wireframe: malla,
-    autoHighlight: true,
-    highlightColor: [90, 200, 255, 100],
-    pickable: true,
-    getElevation: (d: (typeof datos)[number]) => d.valor == null ? 0 : d.valor * escalaAltura,
-    getFillColor: (d: (typeof datos)[number]): [number, number, number, number] => {
-      if (d.valor == null) return [140, 140, 135, 90];
-      if (d.valor === 0) return [...hexARgb(p.rampa[0]), 70] as [number, number, number, number];
-      return [...hexARgb(p.rampa[Math.min(clase(d.valor, p.cortes), p.rampa.length - 1)]), 235] as [number, number, number, number];
-    },
-    getLineColor: [255, 255, 255, 60],
-    material: { ambient: 0.42, diffuse: 0.75, shininess: 8, specularColor: [35, 40, 48] },
-    transitions: reducirMovimiento ? undefined : { getElevation: {duration:modo==='cinematico'?650:220,easing:(t:number)=>t*t*(3-2*t)} },
-    updateTriggers: { getElevation: [escalaAltura], getFillColor: [p.rampa, p.cortes] },
-  }), [datos, escalaAltura, p.rampa, p.cortes, reducirMovimiento, malla, modo]);
-
-  const seleccion = useMemo(()=>new PolygonLayer({id:'seleccion-territorial',data:datos.filter(d=>d.cve===p.seleccionado),getPolygon:d=>d.pols.map((ring:number[][])=>ring.map(([x,y]:number[])=>[x,y,(d.valor??0)*escalaAltura+100])),filled:false,stroked:true,getLineColor:[59,130,246,255],getLineWidth:3,lineWidthUnits:'pixels',pickable:false}),[datos,p.seleccionado,escalaAltura]);
-  const tooltip = useCallback((info: PickingInfo) => {
-    const d = info.object as (typeof datos)[number] | undefined;
-    if (!d) return null;
-    return {
-      text: `${d.nombre} (${d.cve})\n${p.fmt(d.valor)}`,
-      style: {
-        backgroundColor: "var(--surface)", color: "var(--ink)",
-        border: "1px solid var(--border-strong)", borderRadius: "10px",
-        fontSize: "12px", fontFamily: "var(--sans)", padding: "8px 10px",
-      },
+  useEffect(() => {
+    const node = host.current;
+    if (!node || !p.territorios.length) return;
+    let renderer: THREE.WebGLRenderer;
+    try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
+    catch { latest.current.onFallo(); return; }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setClearColor(0x000000, 0);
+    node.appendChild(renderer.domElement);
+    renderer.domElement.setAttribute('aria-label', 'Mapa territorial Three.js. Arrastra para rotar; usa la rueda para acercar. La selección por teclado está debajo del mapa.');
+    const territorio = p.territorios.map(t => t.cve).join(",");
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 2500);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = false; controls.minDistance = 12; controls.maxDistance = 550;
+    controls.maxPolarAngle = Math.PI / 2 - 0.03;
+    const marco = marcoDe(p.territorios);
+    const span = Math.max(marco.maxX - marco.minX, marco.maxY - marco.minY);
+    const escala = span > 0 ? 120 / span : 1;
+    const cx = (marco.minX + marco.maxX) / 2, cy = (marco.minY + marco.maxY) / 2;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x64748b, 2.4));
+    const luz = new THREE.DirectionalLight(0xffffff, 2.5); luz.position.set(-50, 100, 60); scene.add(luz);
+    const piezas: Pieza[] = [];
+    for (const t of p.territorios) for (const ring of t.pols) {
+      if (ring.length < 3) continue;
+      const points = ring.map(([lon, lat]) => new THREE.Vector2((mercX(lon) - cx) * escala, (mercY(lat) - cy) * escala));
+      const shape = new THREE.Shape(points);
+      const geometry = new THREE.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: false, steps: 1 });
+      geometry.rotateX(-Math.PI / 2);
+      const material = new THREE.MeshStandardMaterial({ roughness: 0.8, metalness: 0.08 });
+      const mesh: Pieza = new THREE.Mesh(geometry, material);
+      mesh.userData = { cve: t.cve, nombre: t.nombre };
+      scene.add(mesh); piezas.push(mesh);
+    }
+    const grid = new THREE.GridHelper(210, 21, 0x64748b, 0x94a3b8);
+    grid.position.y = -0.15;
+    const gm = grid.material as THREE.Material; gm.transparent = true; gm.opacity = 0.13;
+    scene.add(grid);
+    let visible = true;
+    const render = () => { if (visible && !document.hidden) renderer.render(scene, camera); };
+    const guardar = () => { latest.current.onVista?.({ posicion: camera.position.toArray(), objetivo: controls.target.toArray(), territorio }); render(); };
+    controls.addEventListener('change', guardar);
+    const reset = () => {
+      const aspect = camera.aspect || 1;
+      const distancia = Math.max(155, 100 / aspect);
+      camera.position.set(0, distancia * 0.83, distancia * 0.68);
+      controls.target.set(0, 0, 0); controls.update(); render();
     };
-  }, [p]);
-
-  const gira = (delta: number) => setVista(v => ({ ...v, transitionDuration: reducirMovimiento ? 0 : 650, transitionInterpolator: new LinearInterpolator(["bearing"]), bearing: ((v.bearing ?? 0) + delta) % 360 }));
-  const inclina = (delta: number) => setVista(v => ({ ...v, pitch: Math.max(0, Math.min(70, (v.pitch ?? 0) + delta)) }));
-
-  return (
-    <div className="mapa-3d-escena" ref={contenedor} style={{ position: "relative", width: "100%", height: "clamp(360px, 55vw, 560px)" }}>
-      <label className="mapa-relieve no-imprimir" style={{position:"absolute",left:12,bottom:64,zIndex:5,background:"var(--surface)",padding:8,borderRadius:8}}>Relieve visual <input aria-label="Intensidad del relieve 3D" type="range" min="0" max="1" step="0.1" value={relieve} onChange={e=>setRelieve(Number(e.target.value))}/></label>
-      {activo&&<DeckGL
-        views={new MapView({ orthographic: ortografica })}
-        viewState={vista}
-        onViewStateChange={({ viewState }) => setVista(viewState as MapViewState)}
-        controller={{ dragRotate: true, touchRotate: true, inertia: !reducirMovimiento }}
-        layers={[capa,seleccion]}
-        effects={luces}
-        useDevicePixels={calidad}
-        onError={()=>p.onFallo()}
-        getTooltip={tooltip}
-        onClick={(info: PickingInfo) => {
-          const d = info.object as (typeof datos)[number] | undefined;
-          if (d) p.onSeleccion?.(d.cve);
-        }}
-        style={{ position: "absolute", inset: "0" }}
-      />}
-      <div style={{ position: "absolute", right: 12, bottom: 12, zIndex: 5, display: "flex", flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "calc(100% - 24px)", gap: 6 }} className="no-imprimir mapa-3d-actions">
-        <button className="boton" aria-label="Acercar mapa" onClick={()=>setVista(v=>({...v,zoom:Math.min(12,v.zoom+0.5)}))}>＋</button>
-        <button className="boton" aria-label="Alejar mapa" onClick={()=>setVista(v=>({...v,zoom:Math.max(2,v.zoom-0.5)}))}>−</button>
-        <button className="boton" aria-pressed={malla} onClick={()=>setMalla(!malla)}>Malla 3D</button>
-        <button className="boton" aria-pressed={ortografica} onClick={()=>{setOrtografica(!ortografica);setVista(v=>({...v,pitch:ortografica?46:0,bearing:ortografica?-12:0,transitionDuration:reducirMovimiento?0:550,transitionInterpolator:new LinearInterpolator(['pitch','bearing'])}));}}>{ortografica?"Ortográfica":"Perspectiva"}</button>
-        <button className="boton" onClick={() => inclina(12)} aria-label="Aumentar inclinación">Inclinar ▲</button>
-        <button className="boton" onClick={() => inclina(-12)} aria-label="Reducir inclinación">▼</button>
-        <button className="boton" onClick={() => gira(-20)} aria-label="Rotar a la izquierda">⟲</button>
-        <button className="boton" onClick={() => gira(20)} aria-label="Rotar a la derecha">⟳</button>
-        <button className="boton" onClick={() => setVista(inicial)} aria-label="Restablecer vista">Restablecer</button>
-      </div>
-      <p className="nota" style={{ position: "absolute", left: 12, top: 12, zIndex: 5, maxWidth: 240 }}>
-        La <strong>altura</strong> representa {p.metrica === "conteo" ? "el número de delitos registrados" : "la tasa por 100 mil habitantes"} del periodo mostrado (escala lineal desde cero). Máximo visible: {p.fmt(p.maxV)}. El control de relieve modifica la representación, no los valores.
-      </p>
+    const resize = () => {
+      const w = node.clientWidth, h = node.clientHeight;
+      if (!w || !h) return;
+      camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); render();
+    };
+    resize();
+    if (p.vistaGuardada?.territorio === territorio) {
+      camera.position.fromArray(p.vistaGuardada.posicion); controls.target.fromArray(p.vistaGuardada.objetivo); controls.update();
+    } else reset();
+    actualizar.current = () => {
+      const q = latest.current;
+      for (const mesh of piezas) {
+        const v = q.valores[mesh.userData.cve]?.v ?? null;
+        mesh.userData.valor = v;
+        mesh.scale.y = v == null || q.maxV <= 0 ? 0.12 : Math.max(0.12, Math.max(0, v) / q.maxV * 24 * configuracion.current.relieve);
+        mesh.material.color.set(v == null ? '#8c8c87' : v === 0 ? '#e2e8f0' : q.rampa[Math.min(clase(v, q.cortes), q.rampa.length - 1)]);
+        mesh.material.emissive.set(mesh.userData.cve === q.seleccionado ? '#2563eb' : '#000000');
+        mesh.material.emissiveIntensity = 0.35;
+        mesh.material.wireframe = configuracion.current.malla;
+      }
+      render();
+    };
+    actualizar.current();
+    acciones.current = accion => {
+      if (accion === 'reset') { reset(); setPlana(false); }
+      else if (accion === 'plana') {
+        const d = camera.position.distanceTo(controls.target);
+        camera.position.copy(controls.target).add(new THREE.Vector3(0, d, 0.001)); controls.update(); setPlana(true);
+      } else if (accion === 'perspectiva') { reset(); setPlana(false); }
+      else { camera.position.sub(controls.target).multiplyScalar(accion === '+' ? 0.8 : 1.25).clampLength(12, 550).add(controls.target); controls.update(); }
+      guardar();
+    };
+    const raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
+    const pick = (e: PointerEvent) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.set((e.clientX - rect.left) / rect.width * 2 - 1, -(e.clientY - rect.top) / rect.height * 2 + 1);
+      raycaster.setFromCamera(pointer, camera);
+      return raycaster.intersectObjects(piezas, false)[0]?.object;
+    };
+    const move = (e: PointerEvent) => {
+      const obj = pick(e);
+      setHover(obj ? { nombre: obj.userData.nombre, cve: obj.userData.cve, valor: obj.userData.valor } : null);
+      renderer.domElement.style.cursor = obj ? 'pointer' : 'grab';
+    };
+    let inicio = { x: 0, y: 0 };
+    const down = (e: PointerEvent) => { inicio = { x: e.clientX, y: e.clientY }; };
+    const up = (e: PointerEvent) => { if (Math.hypot(e.clientX - inicio.x, e.clientY - inicio.y) < 5) { const obj = pick(e); if (obj) latest.current.onSeleccion?.(obj.userData.cve); } };
+    const leave = () => setHover(null);
+    const lost = (e: Event) => { e.preventDefault(); latest.current.onFallo(); };
+    const canvas = renderer.domElement;
+    canvas.addEventListener('pointermove', move); canvas.addEventListener('pointerdown', down); canvas.addEventListener('pointerup', up); canvas.addEventListener('pointerleave', leave); canvas.addEventListener('webglcontextlost', lost);
+    const ro = new ResizeObserver(resize); ro.observe(node);
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; render(); }); io.observe(node);
+    document.addEventListener('visibilitychange', render);
+    return () => {
+      ro.disconnect(); io.disconnect(); document.removeEventListener('visibilitychange', render);
+      canvas.removeEventListener('pointermove', move); canvas.removeEventListener('pointerdown', down); canvas.removeEventListener('pointerup', up); canvas.removeEventListener('pointerleave', leave); canvas.removeEventListener('webglcontextlost', lost);
+      controls.removeEventListener('change', guardar); controls.dispose();
+      for (const mesh of piezas) { mesh.geometry.dispose(); mesh.material.dispose(); }
+      grid.geometry.dispose(); gm.dispose(); renderer.dispose(); canvas.remove();
+      actualizar.current = () => {}; acciones.current = () => {};
+    };
+  }, [p.territorios]);
+  const actual = hover ? p.valores[hover.cve]?.v ?? null : null;
+  return <div className="three-dashboard">
+    <div className="three-heading"><span className="three-badge">EXPLORACIÓN TERRITORIAL · VISTA 3D</span><p>Arrastra para rotar · Desplaza para acercar · Selecciona un territorio</p></div>
+    <div className="three-viewport" ref={host} />
+    {hover && <div className="three-tooltip" role="status"><strong>{hover.nombre}</strong><span>{p.fmt(actual)}</span><small>Clave territorial {hover.cve}</small></div>}
+    <div className="three-toolbar" role="group" aria-label="Controles de cámara 3D">
+      <button className="boton" onClick={() => acciones.current('+')} aria-label="Acercar">＋</button>
+      <button className="boton" onClick={() => acciones.current('-')} aria-label="Alejar">−</button>
+      <button className="boton" aria-pressed={plana} onClick={() => acciones.current(plana ? 'perspectiva' : 'plana')}>{plana ? 'Perspectiva' : 'Vista superior'}</button>
+      <button className="boton" aria-pressed={malla} onClick={() => setMalla(!malla)}>Malla</button>
+      <button className="boton" onClick={() => acciones.current('reset')}>Restablecer</button>
+      <label>Relieve <input type="range" aria-label="Intensidad del relieve" min="0" max="1" step="0.1" value={relieve} onChange={e => setRelieve(Number(e.target.value))} /></label>
     </div>
-  );
+    <p className="three-method">Altura lineal: {p.metrica === 'conteo' ? 'delitos registrados' : 'tasa por 100 mil habitantes'}. Máximo de referencia: {p.fmt(p.maxV)}. El relieve modifica la representación; las cifras permanecen iguales. Cero: plano claro · Sin información: plano gris.</p>
+  </div>;
 }
