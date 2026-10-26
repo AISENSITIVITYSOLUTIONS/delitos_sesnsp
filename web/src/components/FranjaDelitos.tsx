@@ -3,6 +3,7 @@ import type { SeriesNacionales, PoblacionAnual } from "../lib/contratos";
 import { serieMensual, aAnual, acumulado, tasaPeriodo, tasaAnual } from "../lib/series";
 import { colorDelito } from "../theme/paleta";
 import { fEntero, fCompacto, fPct, fTasa } from "../lib/formato";
+import { useCuentaAtras } from "../lib/animar";
 import { useEstado } from "../lib/estado";
 
 /** Íconos de trazo por delito (genéricos, sin color propio). */
@@ -159,7 +160,9 @@ function TarjetaDelito({ f, etiqueta, metrica, pulso }: { f: Ficha; etiqueta: st
   }, []);
 
   const esTasa = metrica === "tasa";
-  const cifra = esTasa ? fTasa(f.tasaP) : fEntero(f.cantidad);
+  const objetivoCifra = esTasa ? f.tasaP : f.cantidad;
+  const animada = useCuentaAtras(objetivoCifra, 1100 + f.rango * 60);
+  const cifra = animada == null ? "—" : esTasa ? fTasa(animada) : fEntero(animada);
   const valores = esTasa ? f.rateAnnual : f.countAnnual;
   const cambio = esTasa ? f.cambioRate : f.cambioCount;
   const sub = esTasa

@@ -97,3 +97,55 @@ html:not([data-efectos=apagado]) :is(.impacto-kpis article,.hallazgo)::after{bac
 .fd-scene:hover::after{ opacity:.25; transform: translateY(8px) scale(.9); }
 /* Realce de borde en la cara para leer el volumen */
 .fd-card:hover .fd-frente{ box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 -18px 30px -22px rgba(0,0,0,.6); }
+/* ---- Fichas con vida (premium) ---- */
+@property --fd-ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.fd-card{ box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 10px 30px -14px rgba(2,8,20,.55), 0 2px 6px -2px rgba(2,8,20,.35); transition: box-shadow .35s ease; }
+.fd-card:hover{ box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 26px 48px -18px rgba(2,8,20,.6), 0 0 0 1px color-mix(in srgb, var(--hue) 45%, transparent); }
+/* Borde de luz que gira lentamente, tintado por el color del delito */
+.fd-card::before{ content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px; pointer-events:none; z-index:0;
+  background: conic-gradient(from var(--fd-ang), transparent 0 70%, color-mix(in srgb, var(--hue) 85%, #fff) 82%, transparent 92%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity:.55; transition: opacity .4s ease; }
+.fd-card:hover::before{ opacity:1; }
+@media (prefers-reduced-motion: no-preference){
+  .fd-card::before{ animation: fd-giro 9s linear infinite; }
+  .fd-card:nth-child(3n)::before{ animation-duration: 12s; animation-direction: reverse; }
+}
+@keyframes fd-giro{ to{ --fd-ang: 360deg; } }
+/* Brillo especular que sigue al puntero (usa --mx/--my del tilt) */
+.fd-frente::after, .fd-dorso::after{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:2;
+  background: radial-gradient(260px circle at var(--mx,50%) var(--my,30%), rgba(255,255,255,.18), transparent 60%); opacity:0; transition: opacity .35s ease; }
+.fd-card:hover .fd-frente::after, .fd-card:hover .fd-dorso::after{ opacity:1; }
+/* Icono que flota y respira */
+.fd-ico{ animation: none; }
+@media (prefers-reduced-motion: no-preference){
+  .fd-ico{ animation: fd-flota 4.2s ease-in-out infinite; }
+  .fd-scene:nth-child(2n) .fd-ico{ animation-delay: -1.4s; }
+  .fd-scene:nth-child(3n) .fd-ico{ animation-delay: -2.6s; }
+}
+@keyframes fd-flota{ 0%,100%{ transform: translateY(0) rotate(0deg); } 50%{ transform: translateY(-3px) rotate(-4deg); } }
+/* Tendencia con pulso suave */
+.fd-trend{ transition: transform .3s ease; }
+.fd-card:hover .fd-trend{ transform: translateY(-1px) scale(1.04); }
+@media (prefers-reduced-motion: no-preference){ .fd-trend--alza{ animation: fd-pulso 2.6s ease-in-out infinite; } }
+@keyframes fd-pulso{ 0%,100%{ box-shadow: 0 0 0 0 color-mix(in srgb, #f97316 35%, transparent); } 50%{ box-shadow: 0 0 0 6px transparent; } }
+/* Sparkline: trazo que se dibuja y punto final que late */
+.fd-linea{ filter: drop-shadow(0 0 4px color-mix(in srgb, var(--hue) 70%, transparent)); }
+@media (prefers-reduced-motion: no-preference){
+  .fd-spark circle{ animation: fd-latido 1.8s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+}
+@keyframes fd-latido{ 0%,100%{ transform: scale(1); opacity: 1; } 50%{ transform: scale(1.8); opacity: .35; } }
+/* Cifra: entrada suave */
+.fd-cifra{ animation: fd-entra .6s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes fd-entra{ from{ opacity:0; transform: translateY(6px); } to{ opacity:1; transform:none; } }
+/* Víctimas: anillo de composición que entra girando */
+@media (prefers-reduced-motion: no-preference){
+  .vz-dona{ animation: vz-entra 1.2s cubic-bezier(.2,.8,.2,1) both; }
+  .vz-dona-wrap::after{ content:""; position:absolute; inset:-8px; border-radius:50%; border:1px dashed color-mix(in srgb, var(--vz-muj) 40%, transparent); animation: vz-orbita 14s linear infinite; }
+}
+@keyframes vz-entra{ from{ transform: rotate(-140deg) scale(.7); opacity:0; } to{ transform:none; opacity:1; } }
+@keyframes vz-orbita{ to{ transform: rotate(360deg); } }
+.vz-dona-wrap{ position:relative; }
+/* Pista de voltear: rebote sutil */
+@media (prefers-reduced-motion: no-preference){ .fd-cue svg{ animation: fd-gira 3.6s ease-in-out infinite; } }
+@keyframes fd-gira{ 0%,70%,100%{ transform: rotate(0); } 85%{ transform: rotate(180deg); } }
