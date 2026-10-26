@@ -1,4 +1,4 @@
-import type {MapViewState} from '@deck.gl/core';
+import type { VistaThree } from './Mapa3D';
 import Limite3D from "./Limite3D";
 import { lazy, Suspense, useCallback, useId, useMemo, useRef, useState } from "react";
 import type { Territorio } from "../lib/geo";
@@ -36,8 +36,8 @@ export const soportaWebGL = (() => {
 })();
 
 export default function MapaMx(p: Props) {
-  const vistaGuardada=useRef<MapViewState|undefined>(undefined);
-  const guardarVista=useCallback((v:MapViewState)=>{vistaGuardada.current=v;},[]);
+  const vistaGuardada=useRef<VistaThree|undefined>(undefined);
+  const guardarVista=useCallback((v:VistaThree)=>{vistaGuardada.current=v;},[]);
   const [fallo3D,setFallo3D]=useState(false);
   const [consulta,setConsulta]=useState("");
   const fallo=useCallback(()=>{setFallo3D(true);p.onModo("2d");},[p.onModo]);
