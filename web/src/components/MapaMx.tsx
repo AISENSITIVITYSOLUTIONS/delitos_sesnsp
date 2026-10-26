@@ -21,6 +21,9 @@ interface Props {
   onModo: (m: "2d" | "3d") => void;
   /** Escala fija opcional (máximo del periodo completo en comparaciones). */
   maxFijo?: number;
+  cortesFijos?: number[];
+  vistaExterna?: VistaThree;
+  onVistaExterna?: (v: VistaThree) => void;
   notaEscala?: string;
   variacion?: boolean;
 }
@@ -37,7 +40,7 @@ export const soportaWebGL = (() => {
 
 export default function MapaMx(p: Props) {
   const vistaGuardada=useRef<VistaThree|undefined>(undefined);
-  const guardarVista=useCallback((v:VistaThree)=>{vistaGuardada.current=v;},[]);
+  const guardarVista=useCallback((v:VistaThree)=>{vistaGuardada.current=v;p.onVistaExterna?.(v);},[p.onVistaExterna]);
   const [fallo3D,setFallo3D]=useState(false);
   const [consulta,setConsulta]=useState("");
   const fallo=useCallback(()=>{setFallo3D(true);p.onModo("2d");},[p.onModo]);
@@ -53,7 +56,7 @@ export default function MapaMx(p: Props) {
   const valoresNum = useMemo(() =>
     Object.values(p.valores).map(d => d.v).filter((v): v is number => v != null && (p.variacion || v > 0)),
     [p.valores,p.variacion]);
-  const cortes = useMemo(() => cortesCuantiles(valoresNum, 7), [valoresNum]);
+  const cortes = useMemo(() => p.cortesFijos ?? cortesCuantiles(valoresNum, 7), [valoresNum,p.cortesFijos]);
   const maxV = p.maxFijo ?? (valoresNum.length ? Math.max(...valoresNum.map(Math.abs)) : 0);
 
   const colorDe = (cve: string): string => {
@@ -86,7 +89,7 @@ export default function MapaMx(p: Props) {
       {el3D ? (
         <Limite3D onFallo={fallo}>
         <Suspense fallback={<p className="nota" style={{ padding: 20 }}>Cargando vista 3D…</p>}>
-          <Mapa3D vistaGuardada={vistaGuardada.current} onVista={guardarVista} territorios={p.territorios} valores={p.valores} rampa={rampa}
+          <Mapa3D titulo={p.titulo} vistaExterna={p.vistaExterna} vistaGuardada={vistaGuardada.current} onVista={guardarVista} territorios={p.territorios} valores={p.valores} rampa={rampa}
             cortes={cortes} maxV={maxV} metrica={p.metrica}
             onSeleccion={p.onSeleccion} seleccionado={p.seleccionado??consulta} fmt={fmt} onFallo={fallo} />
         </Suspense>
@@ -163,7 +166,7 @@ export default function MapaMx(p: Props) {
           <span className="leyenda-item"><i className="sin-dato-swatch" /> sin información</span>
         </div>
         <p className="nota" style={{ marginTop: 4, maxWidth: 220 }}>
-          {p.variacion ? "Intervalos simétricos alrededor de cero; turquesa: descenso, terracota: aumento. Vista 2D para comparar cambios con signo." : "Clases por cuantiles del periodo mostrado."}{p.notaEscala ? ` ${p.notaEscala}` : ""}
+          {p.variacion ? "Intervalos simétricos alrededor de cero; turquesa: descenso, terracota: aumento. Vista 2D para comparar cambios con signo." : "Clases por cuantiles; consulta la nota de escala."}{p.notaEscala ? ` ${p.notaEscala}` : ""}
         </p>
       </div>
     </div>

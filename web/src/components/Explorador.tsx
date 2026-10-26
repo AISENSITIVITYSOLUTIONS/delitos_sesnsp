@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import AtlasPremium from "./AtlasPremium";
 import MapaMx, { soportaWebGL, type ValorTerritorio } from "./MapaMx";
 import Grafica, { tokens } from "./Grafica";
 import type { EstatalAnual, MunicipalAnual, PoblacionAnual } from "../lib/contratos";
@@ -206,6 +207,8 @@ export default function Explorador({ estatal, municipal, pob, aniosVisibles, eti
 
   return (
     <div>
+      <AtlasPremium estatal={estatal} municipal={municipal} pob={pob} territorios={territorios} cveEnt={cveEnt} aniosVisibles={aniosVisibles} onEntrar={cve=>set({cveEnt:cve,cveMun:null})} />
+      <details className="atlas-classic"><summary>Explorador clásico · agregado del periodo, tabla y comparación de territorios</summary>
       <div className="fila" style={{ marginTop: 14 }}>
         {cveEnt && (
           <button className="boton" onClick={() => set({ cveEnt: null, cveMun: null })}>
@@ -271,6 +274,7 @@ export default function Explorador({ estatal, municipal, pob, aniosVisibles, eti
         </div>
       </div>
 
+      </details>
       {cveMun && <ComposicionMunicipio cveMun={cveMun} municipal={municipal}
         aniosVisibles={aniosVisibles} etiquetaPeriodo={etiquetaPeriodo} />}
 

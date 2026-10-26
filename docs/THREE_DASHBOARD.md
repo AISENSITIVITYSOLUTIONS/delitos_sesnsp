@@ -23,3 +23,16 @@ Las pruebas adicionales triangulan la cartografía real nacional y municipal de 
 El navegador remoto de esta sesión no pudo alcanzar el servidor local (ERR_CONNECTION_REFUSED). Pendientes: revisión visual en escritorio/móvil, prueba táctil, pérdida de contexto y medición de rendimiento en hardware real. No se garantiza una tasa de cuadros por segundo.
 
 La publicación existente se dispara con cambios en master. Revisar esta rama antes de fusionarla.
+
+## Atlas premium (rama de revisión)
+
+- El atlas abre el contenido principal; el explorador agregado anterior queda en un desplegable.
+- Indicador estatal entre los subtipos publicados o total; en municipio se consulta exclusivamente total, porque el producto municipal no desagrega categorías.
+- Año de análisis propio, reproducción cada 1.8 segundos de años completos; pausa por cambio de indicador, unidad, territorio o pestaña oculta.
+- Comparación de años completos con máximo y cuantiles compartidos sobre el conjunto de años visibles. Dos cámaras sincronizadas en coordenadas Mercator locales. Las escalas cambian al cambiar el universo de territorios o indicador.
+- Ficha: valor, posición entre territorios con dato, cambio anual solo con ambos años completos y denominador positivo, serie y tabla accesible; ranking top 5.
+- Seleccionar no navega automáticamente: el botón Explorar municipios conserva control sobre el descenso territorial.
+- Foco de cámara con transición de 650 ms cancelable por interacción; movimiento reducido respeta prefers-reduced-motion.
+- Exportación PNG de la escena actual con título, periodo, unidad, máximo, leyenda y fuente. No incluye el panel HTML ni sustituye un informe estadístico.
+- La copia del enlace conserva año, indicador y unidad en parámetros URL; el territorio usa el estado global existente. No conserva la cámara ni el modo de comparación.
+- Validación: compilación y 21 pruebas. Navegador de QA no dispone de WebGL 2: se revisaron composición, controles y alternativa 2D; escena WebGL, sincronización de cámaras, PNG y móvil requieren validación en un dispositivo compatible.
