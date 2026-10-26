@@ -225,7 +225,7 @@ export default function Escenario3D({ items, modo, seleccion, onSeleccion, ariaL
     construir();
     const ro = new ResizeObserver(() => { size(); arrancar(); });
     ro.observe(node);
-    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? arrancar() : parar(); });
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) arrancar(); else parar(); });
     io.observe(node);
     const vis = () => { if (document.hidden) parar(); else arrancar(); };
     document.addEventListener("visibilitychange", vis);
