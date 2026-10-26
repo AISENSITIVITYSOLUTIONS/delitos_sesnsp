@@ -15,7 +15,6 @@ export default function Resumen({ sn, estatal, pob, ranking, municipios, complet
  const { metrica, desde, hasta, set } = useEstado();
  const [geo, setGeo] = useState<Territorio[]>([]);
  const [geoError, setGeoError] = useState(false);
- const [modo, setModo] = useState<"2d"|"3d">("2d");
  useEffect(() => { cargar<GeoColeccion>("geo/estados.json").then(g=>setGeo(g.territorios)).catch(()=>setGeoError(true)); }, []);
  const indices = sn.meses.map((m,i)=>({m,i})).filter(({m})=>m>=desde && m<=hasta);
  const serie = indices.map(({m,i})=> {
@@ -44,7 +43,7 @@ export default function Resumen({ sn, estatal, pob, ranking, municipios, complet
    <article className="tarjeta resumen-panel resumen-mapa">
      <h2>Incidencia por entidad federativa</h2>
      <p className="nota">{compatible ? `${anio} · ${estatal.meses_publicados[String(anio)] ?? "—"} meses publicados · todos los delitos` : "Sin un mapa comparable para el tramo seleccionado."}</p>
-     {compatible && (geo.length ? <MapaMx territorios={geo} valores={valores} metrica={metrica} titulo="Incidencia estatal" modo={modo} onModo={setModo}
+     {compatible && (geo.length ? <MapaMx territorios={geo} valores={valores} metrica={metrica} titulo="Incidencia estatal"
        onSeleccion={cve=>{set({cveEnt:cve,cveMun:null});document.getElementById("explorador")?.scrollIntoView({behavior:"smooth"});}}/> : <p role="status">{geoError ? "No se pudo cargar la cartografía." : "Cargando mapa…"}</p>)}
      <a href="#explorador">Abrir explorador territorial →</a>
    </article>
