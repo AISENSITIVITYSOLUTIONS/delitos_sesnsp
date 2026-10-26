@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { cargar } from "../lib/datos";
 import { fEntero, fCompacto } from "../lib/formato";
 import Escenario3D from "./Escenario3D";
+import { useCuentaAtras } from "../lib/animar";
 
 /** Color de una variable CSS en hexadecimal, o un respaldo si no es hex. */
 const colorVar = (nombre: string, respaldo: string) => {
@@ -110,6 +111,7 @@ function TarjetaVictima({ f }: { f: DelitoVic }) {
   }, []);
 
   const pm = f.pct_mujer ?? 0, ph = f.pct_hombre ?? 0, pn = Math.max(0, 100 - pm - ph);
+  const pmAnim = useCuentaAtras(pm, 1200) ?? 0;
   const g1 = pm * 3.6, g2 = (pm + ph) * 3.6;
   const conic = `conic-gradient(var(--vz-muj) 0 ${g1}deg, var(--vz-hom) ${g1}deg ${g2}deg, var(--vz-ni) ${g2}deg 360deg)`;
   const hue = pm >= 50 ? "var(--vz-muj)" : "var(--vz-hom)";
@@ -129,7 +131,7 @@ function TarjetaVictima({ f }: { f: DelitoVic }) {
               <div className="vz-dona-wrap">
                 <div className="vz-dona" style={{ background: conic }} aria-hidden="true" />
                 <div className="vz-dona-centro">
-                  <span className="vz-dona-pct">{pm.toFixed(pm === 100 ? 0 : 1)}<small>%</small></span>
+                  <span className="vz-dona-pct">{pmAnim.toFixed(pm === 100 ? 0 : 1)}<small>%</small></span>
                   <span className="vz-dona-lab">mujeres</span>
                 </div>
               </div>
