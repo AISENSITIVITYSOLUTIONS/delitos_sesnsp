@@ -69,3 +69,31 @@ html[data-efectos=cinematico] :is(.impacto-kpis article,.hallazgo,.impacto-kpis 
 html:not([data-efectos=apagado]) :is(.impacto-kpis article,.hallazgo)::after{background:radial-gradient(ellipse at var(--mx,25%) var(--my,0%),#73a7ef18,transparent 65%)}
 
 .lista-territorios{ list-style:none; padding:0; display:grid; gap:6px; max-height:360px; overflow:auto; }
+
+/* ---- Fichas 3D con profundidad real (capas en Z + paralaje) ---- */
+.fd-scene{ perspective:1100px; }
+.fd-tilt{ transition:transform .5s cubic-bezier(.2,.7,.2,1); }
+/* clip-path recorta sin aplanar el espacio 3D (overflow:hidden lo aplanaría) */
+.fd-frente, .fd-dorso{ overflow:visible!important; clip-path:inset(0 round 16px); transform-style:preserve-3d; }
+.fd-frente>*{ transition:transform .45s cubic-bezier(.2,.7,.2,1); }
+/* Cada capa flota a su profundidad y se desplaza en sentido contrario al puntero */
+.fd-frente .fd-top{ transform: translate3d(calc(var(--px,0) * -6px), calc(var(--py,0) * -6px), 34px); }
+.fd-frente .fd-nombre{ transform: translate3d(calc(var(--px,0) * -4px), calc(var(--py,0) * -4px), 24px); }
+.fd-frente .fd-metrica{ transform: translate3d(calc(var(--px,0) * -8px), calc(var(--py,0) * -8px), 46px); }
+.fd-frente .fd-spark{ transform: translate3d(calc(var(--px,0) * -3px), calc(var(--py,0) * -3px), 14px); }
+.fd-frente .fd-cue{ transform: translate3d(0,0,10px); }
+.fd-frente .fd-cifra{ text-shadow: 0 1px 0 rgba(0,0,0,.25), 0 14px 26px rgba(0,0,0,.55); }
+/* Icono: vuela más alto que el resto y gira de forma continua */
+@media (prefers-reduced-motion: no-preference){
+  .fd-ico{ animation: fd-flota3d 5.2s ease-in-out infinite; transform-style:preserve-3d; }
+}
+@keyframes fd-flota3d{
+  0%,100%{ transform: translate3d(0,0,62px) rotateY(0deg) rotateX(0deg); }
+  50%{ transform: translate3d(0,-4px,70px) rotateY(180deg) rotateX(8deg); }
+}
+/* Sombra de contacto que se aleja cuando la ficha se levanta */
+.fd-scene::after{ content:""; position:absolute; left:12%; right:12%; bottom:-14px; height:22px; border-radius:50%; pointer-events:none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--hue,#38bdf8) 35%, transparent), transparent 70%); filter: blur(6px); opacity:.55; transition: opacity .4s ease, transform .4s ease; }
+.fd-scene:hover::after{ opacity:.25; transform: translateY(8px) scale(.9); }
+/* Realce de borde en la cara para leer el volumen */
+.fd-card:hover .fd-frente{ box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 -18px 30px -22px rgba(0,0,0,.6); }

@@ -148,9 +148,11 @@ function TarjetaDelito({ f, etiqueta, metrica, pulso }: { f: Ficha; etiqueta: st
       const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
       tilt.style.setProperty("--mx", `${(px + 0.5) * 100}%`);
       tilt.style.setProperty("--my", `${(py + 0.5) * 100}%`);
-      tilt.style.transform = `rotateY(${px * 7}deg) rotateX(${-py * 7}deg)`;
+      tilt.style.setProperty("--px", `${px * 2}`);
+      tilt.style.setProperty("--py", `${py * 2}`);
+      tilt.style.transform = `rotateY(${px * 12}deg) rotateX(${-py * 10}deg)`;
     };
-    const salir = () => { tilt.style.transform = ""; };
+    const salir = () => { tilt.style.transform = ""; tilt.style.setProperty("--px", "0"); tilt.style.setProperty("--py", "0"); };
     scene.addEventListener("pointermove", mover, { passive: true });
     scene.addEventListener("pointerleave", salir);
     return () => { scene.removeEventListener("pointermove", mover); scene.removeEventListener("pointerleave", salir); };
