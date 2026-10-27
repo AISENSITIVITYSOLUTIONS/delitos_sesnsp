@@ -85,16 +85,18 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
   });
 
   // Auto-volteo de presentación: onda escalonada cada 15 s; se pausa al interactuar o si el documento está oculto.
-  const [pulso, setPulso] = useState(0);
+  const fichasTotal = top10.length;
+  // Turno secuencial: cada 10 s le toca a la siguiente ficha voltearse y mostrar su reverso.
+  const [turno, setTurno] = useState(-1);
   const pausaRef = useRef(false);
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion:reduce)").matches) return;
     const id = setInterval(() => {
       if (pausaRef.current || document.hidden) return;
-      setPulso(p => p + 1);
-    }, 15000);
+      setTurno(t => (t + 1) % fichasTotal);
+    }, 10000);
     return () => clearInterval(id);
-  }, []);
+  }, [fichasTotal]);
 
   const titulo = metrica === "tasa" ? "Los diez delitos por tasa /100 mil" : "Los diez delitos más frecuentes";
 
@@ -113,7 +115,7 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
       <div className="fd-strip" role="list"
         onPointerEnter={() => { pausaRef.current = true; }} onPointerLeave={() => { pausaRef.current = false; }}
         onFocusCapture={() => { pausaRef.current = true; }} onBlurCapture={() => { pausaRef.current = false; }}>
-        {fichas.map(f => <TarjetaDelito key={f.delito_id} f={f} etiqueta={ranking.etiqueta} metrica={metrica} pulso={pulso} />)}
+        {fichas.map(f => <TarjetaDelito key={f.delito_id} f={f} etiqueta={ranking.etiqueta} metrica={metrica} activa={turno === f.rango} />)}
       </div>
       <p className="nota fd-pie">
         Universo: nacional (fuente estatal) · {ranking.etiqueta} · elaboración propia con datos del SESNSP.
@@ -123,7 +125,7 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
   );
 }
 
-function TarjetaDelito({ f, etiqueta, metrica, pulso }: { f: Ficha; etiqueta: string; metrica: Metrica; pulso: number }) {
+function TarjetaDelito({ f, etiqueta, metrica, activa }: { f: Ficha; etiqueta: string; metrica: Metrica; activa: boolean }) {
   const [volteada, setVolteada] = useState(false);
   const [hov, setHov] = useState(false);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -131,12 +133,13 @@ function TarjetaDelito({ f, etiqueta, metrica, pulso }: { f: Ficha; etiqueta: st
   const idDorso = useId();
   const voltear = () => setVolteada(v => !v);
 
-  // Auto-volteo en onda (retraso por posición de la ficha); no se activa en el primer render.
+  // Su turno: se voltea para mostrar el reverso y regresa a los 4.2 s.
   useEffect(() => {
-    if (pulso === 0) return;
-    const t = setTimeout(() => setVolteada(v => !v), f.rango * 70);
+    if (!activa) return;
+    setVolteada(true);
+    const t = setTimeout(() => setVolteada(false), 4200);
     return () => clearTimeout(t);
-  }, [pulso, f.rango]);
+  }, [activa]);
 
   useEffect(() => {
     const scene = sceneRef.current, tilt = tiltRef.current;
