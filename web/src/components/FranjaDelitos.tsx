@@ -203,8 +203,8 @@ function TarjetaDelito({ f, etiqueta, metrica, pulso, relativa }: { f: Ficha; et
                 <Spark key={`${metrica}-${volteada}`} valores={valores} />
               </div>
               <span className="fd-cue" aria-hidden="true"><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: CICLO }} /> voltear</span>
+              {f.rango === 0 && <Vitrina3D valor={relativa} color={f.color} hover={hov} />}
             </div>
-            {f.rango === 0 && <Vitrina3D valor={relativa} color={f.color} hover={hov} />}
             {/* Dorso */}
             <div className="fd-cara fd-dorso" id={idDorso} aria-hidden={!volteada}>
               <div className="fd-top"><span className="fd-rotulo">{f.nombre}</span>
