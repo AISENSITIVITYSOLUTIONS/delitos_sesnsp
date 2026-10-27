@@ -4,6 +4,7 @@ import { serieMensual, aAnual, acumulado, tasaPeriodo, tasaAnual } from "../lib/
 import { colorDelito } from "../theme/paleta";
 import { fEntero, fCompacto, fPct, fTasa } from "../lib/formato";
 import { useCuentaAtras } from "../lib/animar";
+import Vitrina3D from "./Vitrina3D";
 import { useEstado } from "../lib/estado";
 
 /** Íconos de trazo por delito (genéricos, sin color propio). */
@@ -112,7 +113,8 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
       <div className="fd-strip" role="list"
         onPointerEnter={() => { pausaRef.current = true; }} onPointerLeave={() => { pausaRef.current = false; }}
         onFocusCapture={() => { pausaRef.current = true; }} onBlurCapture={() => { pausaRef.current = false; }}>
-        {fichas.map(f => <TarjetaDelito key={f.delito_id} f={f} etiqueta={ranking.etiqueta} metrica={metrica} pulso={pulso} />)}
+        {fichas.map(f => <TarjetaDelito key={f.delito_id} f={f} etiqueta={ranking.etiqueta} metrica={metrica} pulso={pulso}
+          relativa={f.participacion / Math.max(...fichas.map(x => x.participacion), 1)} />)}
       </div>
       <p className="nota fd-pie">
         Universo: nacional (fuente estatal) · {ranking.etiqueta} · elaboración propia con datos del SESNSP.
@@ -122,8 +124,9 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
   );
 }
 
-function TarjetaDelito({ f, etiqueta, metrica, pulso }: { f: Ficha; etiqueta: string; metrica: Metrica; pulso: number }) {
+function TarjetaDelito({ f, etiqueta, metrica, pulso, relativa }: { f: Ficha; etiqueta: string; metrica: Metrica; pulso: number; relativa: number }) {
   const [volteada, setVolteada] = useState(false);
+  const [hov, setHov] = useState(false);
   const sceneRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
   const idDorso = useId();
@@ -175,7 +178,8 @@ function TarjetaDelito({ f, etiqueta, metrica, pulso }: { f: Ficha; etiqueta: st
   const trendTxt = cambio == null ? "s/d" : `${fPct(cambio)} (${f.a0}→${String(f.a1).slice(2)})`;
 
   return (
-    <div className="fd-scene" role="listitem" ref={sceneRef} style={{ animationDelay: `${f.rango * 55}ms` }}>
+    <div className="fd-scene" role="listitem" ref={sceneRef} style={{ animationDelay: `${f.rango * 55}ms` }}
+      onPointerEnter={() => setHov(true)} onPointerLeave={() => setHov(false)}>
       <div className="fd-tilt" ref={tiltRef}>
         <div className={`fd-card${volteada ? " es-volteada" : ""}`} style={{ ["--hue" as string]: f.color }}>
           <div className="fd-flip">
@@ -200,6 +204,7 @@ function TarjetaDelito({ f, etiqueta, metrica, pulso }: { f: Ficha; etiqueta: st
               </div>
               <span className="fd-cue" aria-hidden="true"><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: CICLO }} /> voltear</span>
             </div>
+            {f.rango === 0 && <Vitrina3D valor={relativa} color={f.color} hover={hov} />}
             {/* Dorso */}
             <div className="fd-cara fd-dorso" id={idDorso} aria-hidden={!volteada}>
               <div className="fd-top"><span className="fd-rotulo">{f.nombre}</span>
