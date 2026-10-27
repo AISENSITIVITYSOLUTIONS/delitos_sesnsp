@@ -113,8 +113,7 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
       <div className="fd-strip" role="list"
         onPointerEnter={() => { pausaRef.current = true; }} onPointerLeave={() => { pausaRef.current = false; }}
         onFocusCapture={() => { pausaRef.current = true; }} onBlurCapture={() => { pausaRef.current = false; }}>
-        {fichas.map(f => <TarjetaDelito key={f.delito_id} f={f} etiqueta={ranking.etiqueta} metrica={metrica} pulso={pulso}
-          relativa={f.participacion / Math.max(...fichas.map(x => x.participacion), 1)} />)}
+        {fichas.map(f => <TarjetaDelito key={f.delito_id} f={f} etiqueta={ranking.etiqueta} metrica={metrica} pulso={pulso} />)}
       </div>
       <p className="nota fd-pie">
         Universo: nacional (fuente estatal) · {ranking.etiqueta} · elaboración propia con datos del SESNSP.
@@ -124,7 +123,7 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
   );
 }
 
-function TarjetaDelito({ f, etiqueta, metrica, pulso, relativa }: { f: Ficha; etiqueta: string; metrica: Metrica; pulso: number; relativa: number }) {
+function TarjetaDelito({ f, etiqueta, metrica, pulso }: { f: Ficha; etiqueta: string; metrica: Metrica; pulso: number }) {
   const [volteada, setVolteada] = useState(false);
   const [hov, setHov] = useState(false);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -203,7 +202,7 @@ function TarjetaDelito({ f, etiqueta, metrica, pulso, relativa }: { f: Ficha; et
                 <Spark key={`${metrica}-${volteada}`} valores={valores} />
               </div>
               <span className="fd-cue" aria-hidden="true"><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: CICLO }} /> voltear</span>
-              {f.rango === 0 && <Vitrina3D valor={relativa} color={f.color} hover={hov} />}
+              {f.rango === 0 && <Vitrina3D serie={metrica === "tasa" ? f.rateAnnual : f.countAnnual} color={f.color} hover={hov} />}
             </div>
             {/* Dorso */}
             <div className="fd-cara fd-dorso" id={idDorso} aria-hidden={!volteada}>

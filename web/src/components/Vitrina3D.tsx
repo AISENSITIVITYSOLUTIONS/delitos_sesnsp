@@ -1,27 +1,36 @@
 import { useEffect, useRef } from "react";
-import { crearVitrina, destruirVitrina, fijarValor, type Vitrina } from "../lib/vitrina3d";
+import { crearVitrina, destruirVitrina, fijarPuntero, fijarSerie, type Vitrina } from "../lib/vitrina3d";
 
-/** Objeto 3D de cada ficha: su altura es la participación relativa del delito. */
-export default function Vitrina3D({ valor, color, hover }: { valor: number; color: string; hover: boolean }) {
+/** Terreno 3D de fondo de la ficha: la serie anual del delito como cordillera inmersiva. */
+export default function Vitrina3D({ serie, color, hover }: { serie: number[]; color: string; hover: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const vit = useRef<Vitrina | null>(null);
 
   useEffect(() => {
     const c = ref.current;
     if (!c) return;
-    const v = crearVitrina(c, color);
+    const v = crearVitrina(c, color, serie);
     if (!v) { c.style.display = "none"; return; }
     vit.current = v;
-    fijarValor(v, valor);
-    v.hover = hover;
+    fijarSerie(v, serie);
     const io = new IntersectionObserver(([e]) => { v.visible = e.isIntersecting; });
     io.observe(c);
-    return () => { io.disconnect(); destruirVitrina(v); vit.current = null; };
-    // La vitrina se crea una vez por color; valor y hover se actualizan abajo.
+    const tarjeta = c.closest(".fd-scene");
+    const mover = (e: Event) => {
+      const pe = e as PointerEvent; const r = (tarjeta as HTMLElement).getBoundingClientRect();
+      fijarPuntero(v, ((pe.clientX - r.left) / r.width) * 2 - 1, ((pe.clientY - r.top) / r.height) * 2 - 1);
+    };
+    const salir = () => fijarPuntero(v, 0, 0);
+    tarjeta?.addEventListener("pointermove", mover);
+    tarjeta?.addEventListener("pointerleave", salir);
+    return () => {
+      io.disconnect(); tarjeta?.removeEventListener("pointermove", mover); tarjeta?.removeEventListener("pointerleave", salir);
+      destruirVitrina(v); vit.current = null;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [color]);
 
-  useEffect(() => { if (vit.current) fijarValor(vit.current, valor); }, [valor]);
+  useEffect(() => { if (vit.current) fijarSerie(vit.current, serie); }, [serie]);
   useEffect(() => { if (vit.current) vit.current.hover = hover; }, [hover]);
 
   return <canvas ref={ref} className="fd-vitrina" aria-hidden="true" />;
