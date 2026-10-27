@@ -51,8 +51,8 @@ export function crearVitrina(canvas: HTMLCanvasElement, color: string): Vitrina 
 
   const escena = new THREE.Scene();
   const camara = new THREE.PerspectiveCamera(28, 1, 0.1, 60);
-  camara.position.set(3.4, 4.6, 5.6);
-  camara.lookAt(0, 1.0, 0);
+  camara.position.set(4.2, 5.4, 7.2);
+  camara.lookAt(0, 0.9, 0);
 
   escena.add(new THREE.HemisphereLight(0xffffff, 0x1e293b, 1.5));
   const key = new THREE.DirectionalLight(0xffffff, 2.4);
@@ -103,7 +103,7 @@ function cuadro(t: number) {
   const movimiento = !reducido();
   for (const v of activas) {
     v.actual += (v.objetivo - v.actual) * Math.min(1, dt * 3.2);
-    v.columna.scale.set(1, v.actual * 2.6, 1);
+    v.columna.scale.set(1, v.actual * 1.9, 1);
     v.giro += dt * (v.hover ? 1.6 : movimiento ? 0.4 : 0);
     v.columna.rotation.y = v.giro;
     v.anillo.rotation.z += dt * (v.hover ? 2.2 : movimiento ? 0.6 : 0);
