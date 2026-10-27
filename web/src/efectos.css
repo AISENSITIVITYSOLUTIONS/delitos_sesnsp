@@ -151,7 +151,7 @@ html:not([data-efectos=apagado]) :is(.impacto-kpis article,.hallazgo)::after{bac
 @keyframes fd-gira{ 0%,70%,100%{ transform: rotate(0); } 85%{ transform: rotate(180deg); } }
 
 /* ---- Vitrina 3D (canvas dibujado desde Three.js) ---- */
-.fd-cara>.fd-vitrina{ position:absolute; right:10px; top:52px; width:112px; height:112px; pointer-events:none; z-index:2;
+.fd-cara>.fd-vitrina{ position:absolute; right:12px; top:38px; width:98px; height:98px; pointer-events:none; z-index:2;
   transform: translate3d(calc(var(--px,0) * -8px), calc(var(--py,0) * -8px), 58px);
   filter: drop-shadow(0 18px 18px rgba(0,0,0,.5)); transition: transform .45s cubic-bezier(.2,.7,.2,1); }
 .fd-frente{ position:relative; }
