@@ -4,7 +4,6 @@ import { serieMensual, aAnual, acumulado, tasaPeriodo, tasaAnual } from "../lib/
 import { colorDelito } from "../theme/paleta";
 import { fEntero, fCompacto, fPct, fTasa } from "../lib/formato";
 import { useCuentaAtras } from "../lib/animar";
-import Vitrina3D from "./Vitrina3D";
 import { useEstado } from "../lib/estado";
 
 /** Íconos de trazo por delito (genéricos, sin color propio). */
@@ -127,7 +126,6 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
 
 function TarjetaDelito({ f, etiqueta, metrica, activa }: { f: Ficha; etiqueta: string; metrica: Metrica; activa: boolean }) {
   const [volteada, setVolteada] = useState(false);
-  const [hov, setHov] = useState(false);
   const sceneRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
   const idDorso = useId();
@@ -180,8 +178,7 @@ function TarjetaDelito({ f, etiqueta, metrica, activa }: { f: Ficha; etiqueta: s
   const trendTxt = cambio == null ? "s/d" : `${fPct(cambio)} (${f.a0}→${String(f.a1).slice(2)})`;
 
   return (
-    <div className="fd-scene" role="listitem" ref={sceneRef} style={{ animationDelay: `${f.rango * 55}ms` }}
-      onPointerEnter={() => setHov(true)} onPointerLeave={() => setHov(false)}>
+    <div className="fd-scene" role="listitem" ref={sceneRef} style={{ animationDelay: `${f.rango * 55}ms` }}>
       <div className="fd-tilt" ref={tiltRef}>
         <div className={`fd-card${volteada ? " es-volteada" : ""}`} style={{ ["--hue" as string]: f.color }}>
           <div className="fd-flip">
@@ -205,7 +202,6 @@ function TarjetaDelito({ f, etiqueta, metrica, activa }: { f: Ficha; etiqueta: s
                 <Spark key={`${metrica}-${volteada}`} valores={valores} />
               </div>
               <span className="fd-cue" aria-hidden="true"><svg viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: CICLO }} /> voltear</span>
-              {f.rango === 0 && <Vitrina3D serie={metrica === "tasa" ? f.rateAnnual : f.countAnnual} color={f.color} hover={hov} />}
             </div>
             {/* Dorso */}
             <div className="fd-cara fd-dorso" id={idDorso} aria-hidden={!volteada}>
