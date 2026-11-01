@@ -23,10 +23,10 @@ interface VictimaDelito {
 interface DatosVictimas { meta: { fuente: string; anios: string[] }; delitos: VictimaDelito[] }
 
 const VISTAS: Array<{ id: Vista; nombre: string }> = [
-  { id: "territorio", nombre: "Territorio" },
+  { id: "victimas", nombre: "Víctimas" },
   { id: "delitos", nombre: "Diez delitos" },
   { id: "tiempo", nombre: "Tiempo" },
-  { id: "victimas", nombre: "Víctimas" },
+  { id: "territorio", nombre: "Territorio" },
 ];
 const MESES = ["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
 const MESES_LARGOS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
@@ -50,7 +50,7 @@ export default function Isometrico({ estatal, pob, sn, ranking }: Props) {
   const motorRef = useRef<Motor | null>(null);
   const piezasRef = useRef<Map<string, Pieza>>(new Map());
   const [fallo, setFallo] = useState(false);
-  const [vista, setVista] = useState<Vista>("territorio");
+  const [vista, setVista] = useState<Vista>("victimas");
   const [delito, setDelito] = useState<string>(TODOS);
   const anios = useMemo(() => aniosCompletos(estatal), [estatal]);
   const [anio, setAnio] = useState<number>(() => anios[anios.length - 1]);
