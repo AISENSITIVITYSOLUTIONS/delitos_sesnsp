@@ -126,7 +126,37 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
   const alClic = (e: React.MouseEvent<HTMLDivElement>) => {
     if (huboArrastre.current) { e.stopPropagation(); e.preventDefault(); huboArrastre.current = false; }
   };
+  // Desplazamiento automático: la pista avanza sola, despacio, y regresa al llegar al final.
+  // Se detiene con el cursor encima, al enfocar, al arrastrar, fuera de pantalla o con la pestaña oculta.
+  const manualHasta = useRef(0);
+  useEffect(() => {
+    const el = pistaRef.current;
+    if (!el || matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+    const VEL = 26; // px por segundo
+    let raf = 0, visible = false, dir = 1, pos = el.scrollLeft, previo = 0;
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0.25 });
+    io.observe(el);
+    const tocar = () => { manualHasta.current = performance.now() + 4000; };
+    el.addEventListener("touchstart", tocar, { passive: true });
+    el.addEventListener("wheel", tocar, { passive: true });
+    const paso = (t: number) => {
+      raf = requestAnimationFrame(paso);
+      const dt = previo ? Math.min(0.05, (t - previo) / 1000) : 0;
+      previo = t;
+      const max = el.scrollWidth - el.clientWidth;
+      const quieto = !visible || document.hidden || pausaRef.current || arrastre.current != null || t < manualHasta.current || max <= 0;
+      el.classList.toggle("es-auto", !quieto);
+      if (quieto) { pos = el.scrollLeft; return; }
+      pos += dir * VEL * dt;
+      if (pos >= max) { pos = max; dir = -1; } else if (pos <= 0) { pos = 0; dir = 1; }
+      el.scrollLeft = pos;
+    };
+    raf = requestAnimationFrame(paso);
+    return () => { cancelAnimationFrame(raf); io.disconnect(); el.removeEventListener("touchstart", tocar); el.removeEventListener("wheel", tocar); el.classList.remove("es-auto"); };
+  }, []);
+
   const avanzar = (dir: number) => {
+    manualHasta.current = performance.now() + 4000;
     const el = pistaRef.current;
     if (!el) return;
     const ficha = el.querySelector<HTMLElement>(".fd-scene");
@@ -150,7 +180,7 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
       </p>
       <div className="fd-pista-wrap">
         <div className="fd-pista-nav no-imprimir">
-          <span className="fd-pista-pista" aria-hidden="true">Arrastra para recorrer</span>
+          <span className="fd-pista-pista" aria-hidden="true">Avanza sola · pausa al pasar el cursor · arrastra</span>
           <button type="button" className="fd-pista-btn" onClick={() => avanzar(-1)} aria-label="Fichas anteriores">‹</button>
           <button type="button" className="fd-pista-btn" onClick={() => avanzar(1)} aria-label="Fichas siguientes">›</button>
         </div>
