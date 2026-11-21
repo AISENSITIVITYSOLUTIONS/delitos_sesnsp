@@ -15,3 +15,7 @@ No se anuncian efectos de ray tracing, oclusión ambiental ni simulaciones físi
 Se adoptaron solo los efectos compatibles con un tablero de datos: barra de progreso de lectura, luz tenue que sigue al cursor (tema oscuro), revelado de secciones al entrar en pantalla, entrada escalonada en 3D de las fichas, título por palabras y un campo de partículas WebGL en la sección «Último corte» (`Ambiente.tsx`, `CampoParticulas.tsx`). Las partículas son decorativas y no representan datos.
 
 No se adoptaron: desplazamiento suavizado (Lenis), porque interfiere con el zoom de mapas y gráficas; el carrusel en anillo, porque oculta la mayoría de las cifras a la vez; ni las transiciones de fotografía, que no aplican. Sin dependencias nuevas (no se añadió GSAP).
+
+## «Último corte» ampliado — 21 de noviembre de 2026
+
+Las barras mensuales pasan a una escena WebGL (`BarrasMes3D.tsx`, Three.js): volumen con luz, reflejo en el piso, paralaje de cámara y selección por cursor o toque con ficha del mes (registros, promedio diario y variación). La altura parte de cero. Si WebGL no está disponible se muestra la versión anterior en CSS con el eje de meses. La lista de meses se conserva oculta visualmente para lectores de pantalla e impresión. Las fichas de indicadores suman minigráficos (escala propia de cada ficha) y la lista de delitos del mes muestra cinco con su participación.
