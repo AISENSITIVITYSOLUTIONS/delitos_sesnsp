@@ -5,6 +5,7 @@ import { colorDelito } from "../theme/paleta";
 import { fEntero, fCompacto, fPct, fTasa } from "../lib/formato";
 import { useCuentaAtras } from "../lib/animar";
 import { useEstado } from "../lib/estado";
+import "./franja-pista.css";
 
 /** Íconos de trazo por delito (genéricos, sin color propio). */
 const ICONOS: Record<string, string> = {
@@ -97,6 +98,42 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
     return () => clearInterval(id);
   }, [fichasTotal]);
 
+  // Pista horizontal arrastrable (adaptada de «Lo que pasa esta semana» de Decroly).
+  const pistaRef = useRef<HTMLDivElement>(null);
+  const arrastre = useRef<{ x: number; s: number; movido: boolean } | null>(null);
+  const huboArrastre = useRef(false);
+  const alBajar = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse" || e.button !== 0 || !pistaRef.current) return;
+    arrastre.current = { x: e.clientX, s: pistaRef.current.scrollLeft, movido: false };
+    huboArrastre.current = false;
+  };
+  const alMover = (e: React.PointerEvent<HTMLDivElement>) => {
+    const a = arrastre.current, el = pistaRef.current;
+    if (!a || !el) return;
+    const dx = e.clientX - a.x;
+    if (!a.movido && Math.abs(dx) < 6) return;
+    if (!a.movido) { a.movido = true; el.classList.add("es-arrastre"); }
+    el.scrollLeft = a.s - dx;
+  };
+  const alSoltar = (_e: React.PointerEvent<HTMLDivElement>) => {
+    const a = arrastre.current;
+    if (!a) return;
+    huboArrastre.current = a.movido;
+    arrastre.current = null;
+    pistaRef.current?.classList.remove("es-arrastre");
+  };
+  // Un arrastre no debe voltear la ficha sobre la que se soltó.
+  const alClic = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (huboArrastre.current) { e.stopPropagation(); e.preventDefault(); huboArrastre.current = false; }
+  };
+  const avanzar = (dir: number) => {
+    const el = pistaRef.current;
+    if (!el) return;
+    const ficha = el.querySelector<HTMLElement>(".fd-scene");
+    const paso = ficha ? (ficha.offsetWidth + 14) * 2 : el.clientWidth * 0.6;
+    el.scrollBy({ left: dir * paso, behavior: "smooth" });
+  };
+
   const titulo = metrica === "tasa" ? "Los diez delitos por tasa /100 mil" : "Los diez delitos más frecuentes";
 
   return (
@@ -111,10 +148,19 @@ export default function FranjaDelitos({ ranking, sn, pob }: Props) {
           ? <>Tasa por cada 100 mil habitantes, {ranking.etiqueta} (denominador poblacional CONAPO). El orden coincide con el de volumen porque comparten el mismo denominador nacional.</>
           : <>Delitos registrados, {ranking.etiqueta}. Cada ficha se voltea: toca para ver cuánto cambió a lo largo del periodo, su promedio mensual y su peso en el total. La frecuencia no equivale a gravedad.</>}
       </p>
-      <div className="fd-strip" role="list"
-        onPointerEnter={() => { pausaRef.current = true; }} onPointerLeave={() => { pausaRef.current = false; }}
-        onFocusCapture={() => { pausaRef.current = true; }} onBlurCapture={() => { pausaRef.current = false; }}>
-        {fichas.map(f => <TarjetaDelito key={f.delito_id} f={f} etiqueta={ranking.etiqueta} metrica={metrica} activa={turno === f.rango} />)}
+      <div className="fd-pista-wrap">
+        <div className="fd-pista-nav no-imprimir">
+          <span className="fd-pista-pista" aria-hidden="true">Arrastra para recorrer</span>
+          <button type="button" className="fd-pista-btn" onClick={() => avanzar(-1)} aria-label="Fichas anteriores">‹</button>
+          <button type="button" className="fd-pista-btn" onClick={() => avanzar(1)} aria-label="Fichas siguientes">›</button>
+        </div>
+        <div className="fd-strip fd-strip--pista" role="list" ref={pistaRef}
+          onPointerDown={alBajar} onPointerMove={alMover} onPointerUp={alSoltar} onPointerCancel={alSoltar}
+          onClickCapture={alClic}
+          onPointerEnter={() => { pausaRef.current = true; }} onPointerLeave={e => { pausaRef.current = false; alSoltar(e); }}
+          onFocusCapture={() => { pausaRef.current = true; }} onBlurCapture={() => { pausaRef.current = false; }}>
+          {fichas.map(f => <TarjetaDelito key={f.delito_id} f={f} etiqueta={ranking.etiqueta} metrica={metrica} activa={turno === f.rango} />)}
+        </div>
       </div>
       <p className="nota fd-pie">
         Universo: nacional (fuente estatal) · {ranking.etiqueta} · elaboración propia con datos del SESNSP.
@@ -223,6 +269,7 @@ function TarjetaDelito({ f, etiqueta, metrica, activa }: { f: Ficha; etiqueta: s
           </div>
         </div>
       </div>
+      <p className="fd-leyenda">{sub}</p>
     </div>
   );
 }
