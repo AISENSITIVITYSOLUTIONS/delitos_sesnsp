@@ -124,7 +124,55 @@ def construir(estatal_csv: str, municipal_2026_csv: str | None, salida: str) -> 
     print(f"victimas.json escrito: {len(delitos)} delitos → {salida}")
 
 
-if __name__ == "__main__":
+def actualizar_2026(victimas_json: str, estatal_2026_csv: str, salida: str) -> None:
+    """Actualiza solo el corte parcial 2026 de un victimas.json ya publicado,
+    con la fuente ESTATAL RNID de víctimas (autoritativa). La serie 2015–2025
+    se conserva tal cual. Uso:
+      python victimas.py --solo-2026 <victimas.json> <RNID-Victimas_Estatal-2026.csv> <salida.json>
+    """
+    abrev = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+    r = leer(estatal_2026_csv)
+    h = next(r)
+    hj = {c.strip(): i for i, c in enumerate(h)}
+    jMes = [hj[m] for m in MESES]
+    jSub, jSexo = hj["Subtipo de delito"], hj["Sexo"]
+    tot26: dict = {}
+    ultimo = 0
+    for row in r:
+        vals = []
+        for j in jMes:
+            try:
+                vals.append(int(float(row[j] or 0)))
+            except ValueError:
+                vals.append(0)
+        for k, v in enumerate(vals):
+            if v:
+                ultimo = max(ultimo, k + 1)
+        v = sum(vals)
+        if v == 0:
+            continue
+        d = tot26.setdefault(row[jSub].strip(), {})
+        d[row[jSexo].strip()] = d.get(row[jSexo].strip(), 0) + v
+    if not ultimo:
+        raise RuntimeError("Archivo de víctimas 2026 sin valores distintos de cero")
+    out = json.load(open(victimas_json, encoding="utf-8"))
+    for d in out["delitos"]:
+        t = tot26.get(d["nombre"], {})
+        d["total_2026"] = sum(t.values())
+        d["mujer_2026"] = t.get("Mujer")
+    etiqueta = f"ene–{abrev[ultimo - 1]}"
+    out["meta"]["generado_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    out["meta"]["corte_2026"] = f"2026-{ultimo:02d}"
+    out["meta"]["etiqueta_2026"] = etiqueta
+    out["meta"]["fuente"] = ("SESNSP — Víctimas del fuero común (estatal, instrumento 2015–2025); "
+                             f"corte parcial 2026 de la fuente estatal RNID ({etiqueta}).")
+    json.dump(out, open(salida, "w", encoding="utf-8"), ensure_ascii=False)
+    print(f"victimas.json actualizado: corte 2026 {etiqueta} → {salida}")
+
+
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "--solo-2026":
+    actualizar_2026(sys.argv[2], sys.argv[3], sys.argv[4])
+elif __name__ == "__main__":
     est = sys.argv[1] if len(sys.argv) > 1 else "raw_victimas/Estatal-Victimas-2015-2025.csv"
     mun = sys.argv[2] if len(sys.argv) > 2 else None
     sal = sys.argv[3] if len(sys.argv) > 3 else str(RAIZ / "web" / "public" / "datos" / "victimas.json")
