@@ -3,11 +3,16 @@ import { colorDelito } from "../theme/paleta";
 import Declaraciones from './Declaraciones';
 import Persistencia from './Persistencia';
 import ContrasteFuentes from './ContrasteFuentes';
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useCuentaAtras } from '../lib/animar';
+import CampoParticulas from './CampoParticulas';
+import './evolucion.css';
 import type { SeriesNacionales, PoblacionAnual } from '../lib/contratos';
 import { cambio, valorMes, medida } from '../lib/altoImpacto';
 import { descargarCSV } from '../lib/datos';
 import Grafica from './Grafica';
+const RelieveTemporal=lazy(()=>import('./RelieveTemporal'));
 const fmt=(n:number|null)=>n==null?'No comparable':n.toLocaleString('es-MX',{maximumFractionDigits:2});
 
 const enfoques=[
@@ -17,6 +22,26 @@ const enfoques=[
  ['4 · Afirmaciones','¿Se puede reproducir?','Antes de calificar una declaración se necesita su fuente primaria, fecha, unidad, periodo, canasta, versión de datos y fórmula. Este módulo no emite veredictos sobre declaraciones todavía no documentadas.'],
  ['5 · Contraste externo','¿Qué mide cada fuente?','Contrasta registros con estadísticas de mortalidad y encuestas en sus periodos y universos respectivos. La coincidencia temporal no identifica por sí sola un efecto de gobierno.'],
 ];
+
+/** Cifra que asciende a su valor (misma regla de formato que el resto del laboratorio). */
+function Cifra({valor}:{valor:number|null}){const v=useCuentaAtras(valor,800);return <>{fmt(valor==null?null:v)}</>;}
+
+/** Comparación visual referencia → análisis sobre una misma escala que parte de cero. */
+function Mancuerna({a,b,dif}:{a:number|null;b:number|null;dif:number|null}){
+ if(a==null||b==null)return null;
+ const max=Math.max(a,b)*1.08||1,pa=a/max*100,pb=b/max*100;
+ return <div className={`ev-manc ev-manc--${dif==null?'igual':dif>0?'alza':dif<0?'baja':'igual'}`} aria-hidden="true" style={{'--a':`${pa}%`,'--b':`${pb}%`} as CSSProperties}>
+  <i className="ev-manc__via"/><i className="ev-manc__tramo"/><i className="ev-manc__p ev-manc__p--b"/><i className="ev-manc__p ev-manc__p--a"/>
+  <span className="ev-manc__esc"><span>0</span><span>{fmt(max>100?Math.round(max):max)}</span></span>
+ </div>;
+}
+
+/** Pestañas con indicador deslizante bajo la opción activa. */
+function Pestanas({tab,setTab}:{tab:number;setTab:(i:number)=>void}){
+ const ref=useRef<HTMLDivElement>(null);
+ useEffect(()=>{const c=ref.current;if(!c)return;const medir=()=>{const b=c.querySelector<HTMLElement>('[aria-pressed="true"]');if(!b)return;c.style.setProperty('--ix',`${b.offsetLeft}px`);c.style.setProperty('--iy',`${b.offsetTop+b.offsetHeight}px`);c.style.setProperty('--iw',`${b.offsetWidth}px`);};medir();const ro=new ResizeObserver(medir);ro.observe(c);return()=>ro.disconnect();},[tab]);
+ return <div className="impacto-tabs ev-tabs" role="group" aria-label="Enfoques analíticos" ref={ref}>{enfoques.map((t,i)=><button className="boton" key={t[0]} aria-pressed={tab===i} onClick={()=>setTab(i)}>{t[0]}</button>)}<i className="ev-tabs__ind" aria-hidden="true"/></div>;
+}
 export default function AltoImpacto({nm,nr,pob}:{nm:SeriesNacionales;nr:SeriesNacionales|null;pob:PoblacionAnual}){
  const [tramo,setTramo]=useState('nm');const sn=tramo==='nr'&&nr?nr:nm;
  const [id,setId]=useState('homicidio-doloso');const [tab,setTab]=useState(0);
@@ -32,7 +57,7 @@ export default function AltoImpacto({nm,nr,pob}:{nm:SeriesNacionales;nr:SeriesNa
  const unidad=modo==='tasa'?'Delitos por 100 mil habitantes · tasa mensual, no anualizada':modo==='diario'?'Delitos registrados por día del mes':'Delitos registrados';
  const filas=meses.map(m=>[m,valorMes(sn,delito,m),valor(delito,m)]);
  return <section className="seccion impacto" id="alto-impacto" aria-labelledby="t-impacto">
-  <div className="impacto-hero"><div><p className="impacto-eyebrow">Neural Network Initiative / LABORATORIO DE EVIDENCIA</p><h2 id="t-impacto">Evolución y comparación de delitos</h2><p>Medir el cambio. Examinar sus límites. Entender el contexto.</p></div><span className="impacto-badge">Análisis independiente</span></div>
+  <div className="impacto-hero"><CampoParticulas densidad={90}/><div><p className="impacto-eyebrow">Neural Network Initiative / LABORATORIO DE EVIDENCIA</p><h2 id="t-impacto">{'Evolución y comparación de delitos'.split(' ').map((w,i)=><span key={i} className="ev-w" style={{'--i':i} as CSSProperties}>{i>0?' ':''}{w}</span>)}</h2><p>Medir el cambio. Examinar sus límites. Entender el contexto.</p></div><span className="impacto-badge">Análisis independiente</span></div>
   <p className="seccion__desc">Neural Network Initiative presenta todas las categorías principales disponibles en el archivo nacional de cada instrumento, sin clasificarlas como «alto impacto» ni atribuirles una jerarquía de gravedad. El ranking de los diez delitos más frecuentes es una vista resumida, no el catálogo completo. Se muestran delitos registrados, no víctimas. Las metodologías 2015–2025 y RNID desde 2026 se consultan por separado.</p>
   <details className="impacto-metodo"><summary>¿Qué delitos incluye este instrumento? {ids.length} categorías disponibles</summary><p>Listado calculado a partir del archivo cargado; no equivale a contar todas sus modalidades. El número describe esta versión del catálogo. Las modalidades no se suman otra vez a sus categorías principales.</p><ol>{ids.map(k=><li key={k}>{nombre(k)}</li>)}</ol><p>Fuente: {sn.meta.fuente} · corte {sn.meta.corte} · versión {sn.meta.version}.</p></details>
   <details className="impacto-metodo"><summary>Desagregación por sexo y edad: alcance y disponibilidad</summary><p>Esta base de delitos no contiene el sexo ni la edad de cada víctima. Por eso esos filtros todavía no están disponibles. Su incorporación requiere integrar una base de víctimas, validar los delitos y territorios cubiertos y conservar las categorías de sexo o edad no especificados.</p><p>La vista de víctimas deberá diferenciarse de la de delitos registrados. Las tasas por sexo y grupo de edad requieren denominadores poblacionales correspondientes; no se asignarán características a las víctimas a partir del nombre del delito ni se extenderá la cobertura a municipios sin datos.</p><p>Estado: pendiente de integración y validación de la fuente de víctimas.</p></details>
@@ -44,13 +69,20 @@ export default function AltoImpacto({nm,nr,pob}:{nm:SeriesNacionales;nr:SeriesNa
    <label>Mes de comparación<select className="control" value={base} onChange={e=>setBase(e.target.value)}>{meses.filter(m=>m<=actual).map(m=><option key={m}>{m}</option>)}</select></label>
   </div>
   <p className="nota">Filtros propios del laboratorio · ámbito nacional · {unidad}. Las tasas utilizan población total; feminicidio no se presenta aquí como tasa por población femenina.</p>
-  <div className="impacto-kpis" aria-live="polite">
-   <article><span>{nombre(delito)} · {actual}</span><strong>{fmt(a)}</strong><small>{unidad}</small></article>
-   <article><span>Referencia · {base}</span><strong>{fmt(b)}</strong><small>Misma unidad y mismo instrumento</small></article>
-   <article><span>Cambio frente a la referencia</span><strong><CambioVisual valor={dif} sufijo=" %"/></strong><small>{actual===base?'Se está comparando el mismo mes.':actual.slice(5)!==base.slice(5)?'Meses distintos: puede intervenir la estacionalidad.':'Mismo mes del calendario; no implica causalidad.'}</small></article>
+  <div className="impacto-kpis ev-kpis" aria-live="polite">
+   <article className="ev-kpi ev-kpi--a"><span><i className="ev-pt ev-pt--a" aria-hidden="true"/>{nombre(delito)} · {actual}</span><strong><Cifra valor={a}/></strong><small>{unidad}</small></article>
+   <article className="ev-kpi ev-kpi--b"><span><i className="ev-pt ev-pt--b" aria-hidden="true"/>Referencia · {base}</span><strong><Cifra valor={b}/></strong><small>Misma unidad y mismo instrumento</small></article>
+   <article className="ev-kpi ev-kpi--c"><span>Cambio frente a la referencia</span><strong><CambioVisual valor={dif} sufijo=" %"/></strong><Mancuerna a={a} b={b} dif={dif}/><small>{actual===base?'Se está comparando el mismo mes.':actual.slice(5)!==base.slice(5)?'Meses distintos: puede intervenir la estacionalidad.':'Mismo mes del calendario; no implica causalidad.'}</small></article>
   </div>
-  <div className="impacto-tabs" role="group" aria-label="Enfoques analíticos">{enfoques.map((t,i)=><button className="boton" key={t[0]} aria-pressed={tab===i} onClick={()=>setTab(i)}>{t[0]}</button>)}</div>
-  <div className="tarjeta impacto-panel"><h3>{enfoques[tab][1]}</h3><p>{enfoques[tab][2]}</p>
+  <figure className="ev-relieve">
+   <figcaption><span><strong>Relieve temporal</strong> · cada franja es un año; cada punto, un mes</span><span className="ev-relieve__ley"><i className="ev-pt ev-pt--a"/>análisis<i className="ev-pt ev-pt--b"/>referencia</span></figcaption>
+   <Suspense fallback={<div className="rt" aria-hidden="true"/>}>
+    <RelieveTemporal puntos={meses.map(m=>({ym:m,v:valor(delito,m)}))} actual={actual} base={base} color={colorDelito(delito)} formato={fmt} alElegir={m=>{setSeleccion(m);setBase('');}}/>
+   </Suspense>
+   <p className="ev-relieve__nota">{nombre(delito)} · {unidad} · altura desde cero · señala un mes para ver su valor; un clic lo fija como mes de análisis. Es la misma serie de la gráfica y la tabla de «Evolución».</p>
+  </figure>
+  <Pestanas tab={tab} setTab={setTab}/>
+  <div className="tarjeta impacto-panel ev-panel" key={tab}><h3>{enfoques[tab][1]}</h3><p>{enfoques[tab][2]}</p>
    {tab===0&&<><Persistencia sn={sn} id={delito} fin={actual}/><Grafica ariaLabel={`Serie mensual de ${nombre(delito)}`} opcion={{xAxis:{type:'category',data:meses,axisLabel:{color:'#8fa9bf'},axisLine:{lineStyle:{color:'#446078'}}},yAxis:{type:'value',min:0,axisLabel:{color:'#8fa9bf'},splitLine:{lineStyle:{color:'#345063'}}},series:[{type:'line',data:meses.map(m=>valor(delito,m)),connectNulls:false,symbol:'none',lineStyle:{color:colorDelito(delito),width:3},areaStyle:{color:colorDelito(delito),opacity:0.12}}]}}/><details><summary>Ver tabla accesible</summary><div className="impacto-tabla"><table><thead><tr><th>Mes</th><th>Registros</th><th>{unidad}</th></tr></thead><tbody>{meses.map(m=><tr key={m}><td>{m}</td><td>{fmt(valorMes(sn,delito,m))}</td><td>{fmt(valor(delito,m))}</td></tr>)}</tbody></table></div></details><button className="boton" onClick={()=>descargarCSV('neural-network-initiative-comparacion-delitos.csv',['mes','registros',unidad],filas,{fuente:sn.meta.fuente,url:sn.meta.url_fuente,corte:sn.meta.corte,version:String(sn.meta.version),delito,metrica:unidad,instrumento:sn.metodologia,poblacion:pob.meta.fuente,version_poblacion:String(pob.meta.version)})}>Descargar serie CSV</button></>}
    {tab===1&&<div className="impacto-tabla"><table><thead><tr><th>Base, mismo mes</th><th>Valor base</th><th>Valor {actual}</th><th>Variación</th></tr></thead><tbody>{meses.filter(m=>m<actual&&m.slice(5)===actual.slice(5)).map(m=><tr key={m}><td>{m}</td><td>{fmt(valor(delito,m))}</td><td>{fmt(a)}</td><td><CambioVisual valor={cambio(a,valor(delito,m))} sufijo=" %"/></td></tr>)}</tbody></table>{!meses.some(m=>m<actual&&m.slice(5)===actual.slice(5))&&<p>No hay un año anterior comparable dentro de este instrumento. No se empalma con 2025 sin correspondencia validada.</p>}</div>}
    {tab===2&&<div className="impacto-tabla"><table><thead><tr><th>Categoría del catálogo</th><th>{base}</th><th>{actual}</th><th>Cambio</th></tr></thead><tbody>{ids.map(k=><tr key={k}><td><span className="punto" style={{background:colorDelito(k)}}/> {nombre(k)}</td><td>{fmt(valor(k,base))}</td><td>{fmt(valor(k,actual))}</td><td><CambioVisual valor={cambio(valor(k,actual),valor(k,base))} sufijo=" %"/></td></tr>)}</tbody></table></div>}

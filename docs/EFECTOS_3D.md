@@ -23,3 +23,7 @@ Las barras mensuales pasan a una escena WebGL (`BarrasMes3D.tsx`, Three.js): vol
 ## «Quién es víctima» en anillo — 21 de noviembre de 2026
 
 Adaptación del carrusel «Año decroliano»: las diez fichas forman un anillo 3D (CSS) que gira solo, se arrastra, acelera con el desplazamiento de la página y trae al frente la ficha elegida. Las donas tienen grosor (capas apiladas en Z). El anillo es decorativo para lectores de pantalla: la lista ordenada con barras apiladas muestra siempre los diez delitos y sirve de navegación; el panel de detalle sustituye al reverso de las fichas. Con «reducir movimiento» el anillo no gira solo.
+
+## «Evolución y comparación de delitos» — 21 de noviembre de 2026
+
+Se añade el «relieve temporal» (`RelieveTemporal.tsx`, Three.js): cada franja es un año y cada punto un mes de la serie y métrica elegidas, con altura desde cero; un mes sin dato corta la franja (no se interpola). Marca el mes de análisis y el de referencia y los une con un arco; al señalar un mes muestra su valor y un clic lo fija como mes de análisis. Es otra vista de la misma serie de la pestaña «Evolución»: no agrega ni transforma cifras. Sin WebGL no se muestra y quedan la gráfica y la tabla. El comparador suma una escala referencia→análisis que parte de cero; las pestañas tienen indicador deslizante. Los textos, fórmulas y advertencias metodológicas no cambiaron.
