@@ -1,0 +1,95 @@
+/* «Quién es víctima» como carrusel en anillo (adaptación del «Año decroliano» de Decroly):
+   fichas en círculo que giran solas, se arrastran y aceleran con el desplazamiento; donas con grosor. */
+.va{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.9fr);gap:16px;align-items:stretch;margin-top:6px}
+.va-escena{position:relative;min-height:clamp(400px,54vh,500px);perspective:1500px;perspective-origin:50% 34%;overflow:hidden;border-radius:18px;
+  cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;border:1px solid var(--border-strong);
+  background:radial-gradient(70% 60% at 50% 46%,#1493ff1f,transparent 70%),radial-gradient(60% 40% at 50% 100%,color-mix(in srgb,var(--vz-muj) 12%,transparent),transparent 70%),linear-gradient(180deg,var(--surface),var(--page));
+  box-shadow:inset 0 1px 0 #ffffff14,0 22px 50px #0000003a}
+.va-escena.es-arrastre{cursor:grabbing}
+.va-anillo{position:absolute;left:50%;top:47%;width:0;height:0;transform-style:preserve-3d;opacity:0;transition:opacity .8s ease}
+.va--lista .va-anillo{opacity:1}
+.va-card,.va-card *{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.va-card{--c:1;position:absolute;width:clamp(150px,13.5vw,188px);left:calc(clamp(150px,13.5vw,188px) / -2);top:-128px;height:256px;padding:12px 12px 10px;border-radius:16px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;transform-style:preserve-3d;
+  border:1px solid color-mix(in srgb,var(--hue) 42%,transparent);border-top:2px solid var(--hue);
+  background:linear-gradient(165deg,color-mix(in srgb,var(--hue) 13%,var(--surface-2)),var(--surface) 78%);
+  box-shadow:inset 0 1px 0 #ffffff22,0 18px 34px #00000055}
+/* Atenuación de las fichas laterales por elemento hoja: un filtro u opacidad en la ficha aplanaría el 3D de la dona. */
+.va-card__n,.va-card__nom,.va-card__tot,.va-dona__capa,.va-dona__centro{opacity:calc(.22 + .78 * var(--c))}
+.va-card.es-frente{box-shadow:inset 0 1px 0 #ffffff33,0 0 0 1px color-mix(in srgb,var(--hue) 70%,transparent),0 30px 60px -18px color-mix(in srgb,var(--hue) 45%,transparent),0 18px 34px #00000066}
+.va-card__n{align-self:flex-start;font-size:10px;letter-spacing:.14em;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.va-card__nom{margin:2px 0 0;font-family:var(--serif);font-size:15px;font-weight:600;line-height:1.15;color:var(--ink);min-height:2.3em;display:flex;align-items:center;transform:translateZ(8px)}
+.va-card__tot{margin:auto 0 0;font-size:12.5px;color:var(--ink-2);font-variant-numeric:tabular-nums;transform:translateZ(6px)}
+.va-card__tot small{color:var(--ink-3);font-size:11px}
+
+/* Dona con grosor: capas idénticas apiladas en Z; las inferiores se oscurecen para sugerir el canto. */
+.va-dona{position:relative;width:118px;height:118px;margin:8px 0 4px;transform-style:preserve-3d;transform:translateZ(26px) rotateX(16deg)}
+.va-dona__capa{position:absolute;inset:0;border-radius:50%;display:block;transform:translateZ(calc(var(--k) * 2.6px));
+  filter:brightness(calc(.52 + var(--k) * .08));
+  mask:radial-gradient(circle,transparent 0 40px,#000 41px);-webkit-mask:radial-gradient(circle,transparent 0 40px,#000 41px)}
+.va-dona__capa:last-of-type{filter:none;box-shadow:inset 0 0 0 1px #ffffff40}
+.va-dona__centro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transform:translateZ(22px)}
+.va-dona__pct{font-family:var(--serif);font-size:25px;font-weight:700;line-height:1;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums;text-shadow:0 2px 10px #00000066}
+.va-dona__pct small{font-size:13px;color:var(--ink-2);font-weight:600}
+.va-dona__lab{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--vz-muj);font-weight:700}
+
+.va-piso{position:absolute;left:50%;bottom:9%;width:72%;height:84px;translate:-50% 0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,#38baff26,transparent 72%);box-shadow:0 0 0 1px #5cc8ff14 inset}
+.va-ayuda{position:absolute;left:0;right:0;bottom:10px;margin:0;text-align:center;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);pointer-events:none}
+
+.va-panel{display:flex;flex-direction:column;gap:10px;min-width:0}
+.va-detalle{position:relative;padding:12px 14px 12px;border-radius:16px;border:1px solid color-mix(in srgb,var(--hue) 40%,transparent);border-top:2px solid var(--hue);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--hue) 11%,var(--surface-2)),var(--surface));box-shadow:inset 0 1px 0 #ffffff1c,0 14px 30px #00000038;
+  animation:va-entra .55s cubic-bezier(.2,.7,.1,1) both}
+@keyframes va-entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.va-detalle__cab{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.va-detalle__n{font-size:10.5px;letter-spacing:.16em;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.va-nav{display:flex;gap:6px}
+.va-nav button{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--ink);font-size:17px;line-height:1;cursor:pointer;
+  box-shadow:inset 0 1px 0 #ffffff1c,0 3px 0 #00000030;transition:transform .25s cubic-bezier(.2,.7,.1,1),border-color .25s}
+.va-nav button:hover{transform:translateY(-2px);border-color:#56c4ff99}
+.va-nav button:focus-visible,.va-lista button:focus-visible{outline:2px solid #56c4ff;outline-offset:2px}
+.va-detalle__nom{margin:2px 0 0;font-family:var(--serif);font-weight:500;font-size:clamp(22px,2vw,28px);line-height:1.05;letter-spacing:-.015em;color:var(--ink)}
+.va-detalle__pct{margin:6px 0 8px;font-size:13px;color:var(--ink-2)}
+.va-detalle__pct strong{font-family:var(--serif);font-size:30px;line-height:1;color:var(--vz-muj);font-variant-numeric:tabular-nums;margin-right:4px}
+.va-detalle__pct small{font-size:15px}
+.va-desglose{display:grid;grid-template-columns:1fr 1fr;gap:5px 16px;margin:10px 0 0}
+.va-desglose>div{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:12.5px;min-width:0}
+.va-desglose dt{color:var(--ink-2);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.va-desglose dd{margin:0;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.va-desglose dd small{color:var(--ink-3);font-weight:400}
+
+.va-barra{display:flex;height:6px;border-radius:99px;overflow:hidden;background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.va-barra--g{height:10px;box-shadow:inset 0 1px 2px #00000040}
+.va-seg{display:block;height:100%;min-width:0;transition:width .7s cubic-bezier(.2,.7,.1,1)}
+.va-seg--muj{background:linear-gradient(180deg,color-mix(in srgb,var(--vz-muj),#fff 16%),var(--vz-muj))}
+.va-seg--hom{background:var(--vz-hom)}.va-seg--ni{background:var(--vz-ni)}
+
+.va-lista{list-style:none;margin:0;padding:6px;display:flex;flex-direction:column;gap:1px;flex:1 1 auto;justify-content:space-between;border-radius:14px;border:1px solid var(--border-strong);background:var(--surface);box-shadow:inset 0 1px 0 #ffffff14}
+.va-lista button{width:100%;display:grid;grid-template-columns:minmax(0,12.5em) minmax(40px,1fr) 4.2em;align-items:center;gap:10px;padding:5px 8px;border:1px solid transparent;border-radius:9px;background:none;color:var(--ink-2);
+  font:inherit;font-size:12.5px;text-align:left;cursor:pointer;transition:background .25s,border-color .25s,color .25s}
+.va-lista button:hover{background:color-mix(in srgb,var(--ink) 5%,transparent);color:var(--ink)}
+.va-lista button.es-activa{background:color-mix(in srgb,#38baff 12%,transparent);border-color:#56c4ff66;color:var(--ink)}
+.va-lista__nom{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.va-lista b{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600;color:var(--vz-muj)}
+.va-panel .vz-leyenda{margin:0 2px}
+
+@media(max-width:1060px){.va{grid-template-columns:1fr}.va-escena{min-height:0;height:400px}}
+@media(max-width:640px){.va-escena{min-height:0;height:360px;perspective:1000px}.va-card{width:150px;left:-75px}.va-ayuda{letter-spacing:.04em;font-size:9.5px}
+  .va-desglose{grid-template-columns:1fr}.va-lista button{grid-template-columns:minmax(0,9.5em) minmax(30px,1fr) 4.6em}}
+@media(prefers-reduced-motion:reduce){.va-detalle{animation:none}.va-seg{transition:none}.va-anillo{transition:none}}
+@media print{.va{grid-template-columns:1fr}.va-escena,.va-nav{display:none}.va-detalle{animation:none}}
+
+/* Escritorio: el escenario ocupa toda la altura del panel y las fichas crecen con él. */
+@media(min-width:1061px){
+  .va-escena{perspective:1700px}
+  .va-anillo{top:46%}
+  .va-card{width:clamp(180px,15.4vw,226px);left:calc(clamp(180px,15.4vw,226px) / -2);height:318px;top:-159px;padding:14px 14px 12px}
+  .va-card__nom{font-size:17.5px}
+  .va-card__tot{font-size:14px}
+  .va-dona{width:150px;height:150px;margin:12px 0 6px}
+  .va-dona__capa{transform:translateZ(calc(var(--k) * 3.2px));mask:radial-gradient(circle,transparent 0 51px,#000 52px);-webkit-mask:radial-gradient(circle,transparent 0 51px,#000 52px)}
+  .va-dona__centro{transform:translateZ(27px)}
+  .va-dona__pct{font-size:32px}.va-dona__pct small{font-size:16px}.va-dona__lab{font-size:10.5px}
+  .va-piso{bottom:auto;top:calc(46% + 150px);height:110px}
+}
