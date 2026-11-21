@@ -6,6 +6,7 @@ import Resumen from "./components/Resumen";
 import Laboratorio from "./components/Laboratorio";
 import FranjaDelitos from "./components/FranjaDelitos";
 import Victimas from "./components/Victimas";
+import CorteReciente from "./components/CorteReciente";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import Encabezado from "./components/Encabezado";
 import TarjetaHallazgo from "./components/TarjetaHallazgo";
@@ -190,6 +191,7 @@ export default function App() {
       </div>
 
       <main id="contenido" className="contenedor">
+        <CorteReciente nr={datos.nacionalNR} />
         <Suspense fallback={<section className="seccion iso" aria-busy="true"><div className="iso-escenario" /></section>}>
           <Isometrico estatal={datos.estatal} pob={datos.pob} sn={datos.nacionalNM} ranking={datos.rankingDelitos.periodos["2015-2025"] ?? ranking} />
         </Suspense>
