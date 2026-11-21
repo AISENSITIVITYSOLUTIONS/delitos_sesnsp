@@ -19,3 +19,7 @@ No se adoptaron: desplazamiento suavizado (Lenis), porque interfiere con el zoom
 ## «Último corte» ampliado — 21 de noviembre de 2026
 
 Las barras mensuales pasan a una escena WebGL (`BarrasMes3D.tsx`, Three.js): volumen con luz, reflejo en el piso, paralaje de cámara y selección por cursor o toque con ficha del mes (registros, promedio diario y variación). La altura parte de cero. Si WebGL no está disponible se muestra la versión anterior en CSS con el eje de meses. La lista de meses se conserva oculta visualmente para lectores de pantalla e impresión. Las fichas de indicadores suman minigráficos (escala propia de cada ficha) y la lista de delitos del mes muestra cinco con su participación.
+
+## «Quién es víctima» en anillo — 21 de noviembre de 2026
+
+Adaptación del carrusel «Año decroliano»: las diez fichas forman un anillo 3D (CSS) que gira solo, se arrastra, acelera con el desplazamiento de la página y trae al frente la ficha elegida. Las donas tienen grosor (capas apiladas en Z). El anillo es decorativo para lectores de pantalla: la lista ordenada con barras apiladas muestra siempre los diez delitos y sirve de navegación; el panel de detalle sustituye al reverso de las fichas. Con «reducir movimiento» el anillo no gira solo.
