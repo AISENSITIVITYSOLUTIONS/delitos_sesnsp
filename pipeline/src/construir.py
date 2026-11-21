@@ -35,29 +35,29 @@ UPLOADS = Path("/mnt/user-data/uploads/ARTICULO DELITOS")
 
 FUENTES = {
     "estatal_2015_2025": {
-        "archivo": "Estatal-Delitos-2015-2025_sep2026.csv",
-        "zip": "Estatal-Delitos-2015-2025_sep2026.zip",
+        "archivo": "Estatal-Delitos-2015-2025_derivado-municipal_oct2026.csv",
+        "zip": "Estatal-Delitos-2015-2025_oct2026.zip",
         "nivel": "estatal", "metodologia": "NM-2015",
-        "descripcion": "Cifras de Incidencia Delictiva Estatal 2015-2025, SESNSP (instrumento CNSP/38/15)",
+        "descripcion": "Cifras de Incidencia Delictiva Estatal 2015-2025, SESNSP (instrumento CNSP/38/15); corte oct-2026 agregado desde el archivo municipal oficial",
         "url": "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQDbKVoKKhp4SrgMtPRM-FILARntV1yA0s8T7nu84A_HF70",
     },
     "municipal_2015_2025": {
-        "archivo": "Municipal-Delitos-2015-2025_sep2026.csv",
-        "zip": "Municipal-Delitos-2015-2025_sep2026 (4).zip",
+        "archivo": "Municipal-Delitos-2015-2025_oct2026.csv",
+        "zip": "Municipal-Delitos-2015-2025_oct2026.zip",
         "nivel": "municipal", "metodologia": "NM-2015",
         "descripcion": "Cifras de Incidencia Delictiva Municipal 2015-2025, SESNSP (instrumento CNSP/38/15)",
         "url": "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQCIHz1ZZoXjRZ3IySsQQqgFAYKdzEOXXK1YXfhhEhyDMcs",
     },
     "estatal_2026": {
-        "archivo": "RNID-Delitos_Estatal-2026-sep2026.csv",
-        "zip": "RNID-Delitos_Estatal-2026-sep2026.zip",
+        "archivo": "RNID-Delitos_Estatal-2026-oct2026.csv",
+        "zip": "RNID-Delitos_Estatal-2026-oct2026.zip",
         "nivel": "estatal", "metodologia": "NR-2026",
         "descripcion": "RNID: Incidencia Delictiva Estatal 2026, SESNSP (registro vigente desde ene. 2026)",
         "url": "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQBBP0Bh8YBEQpdct54JoLbkAfsR_nJJ5RJa03UwlgRmA2E",
     },
     "municipal_2026": {
-        "archivo": "RNID-Delitos_Municipal-2026-sep2026.csv",
-        "zip": "RNID-Delitos_Municipal-2026-sep2026.zip",
+        "archivo": "RNID-Delitos_Municipal-2026-oct2026.csv",
+        "zip": "RNID-Delitos_Municipal-2026-oct2026.zip",
         "nivel": "municipal", "metodologia": "NR-2026",
         "descripcion": "RNID: Incidencia Delictiva Municipal 2026, SESNSP (registro vigente desde ene. 2026)",
         "url": "https://sspcgob-my.sharepoint.com/:u:/g/personal/cni_sspc_gob_mx/IQAUYyl5NobOT4SHGj0O54aJATRtcR7qsQmNHWj_EOOzP-M",

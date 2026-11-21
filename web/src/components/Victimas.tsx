@@ -10,7 +10,7 @@ interface DelitoVic {
   menores: number; adultos: number; pct_menores: number | null;
   total_2026: number | null; mujer_2026: number | null;
 }
-interface Datos { meta: { fuente: string; universo: string; anios: string[] }; delitos: DelitoVic[] }
+interface Datos { meta: { fuente: string; universo: string; anios: string[]; etiqueta_2026?: string }; delitos: DelitoVic[] }
 
 // Diez delitos con interpretación clara de víctimas (se excluyen residuales y ambiguos).
 const CURADOS = [
@@ -52,13 +52,13 @@ export default function Victimas() {
       </div>
 
       <div className="fd-strip" role="list">
-        {filas.map(f => <TarjetaVictima key={f.id} f={f} />)}
+        {filas.map(f => <TarjetaVictima key={f.id} f={f} etiqueta2026={d.meta.etiqueta_2026 ?? 'parcial'} />)}
       </div>
 
       {fem && (
         <p className="nota fd-pie">
           En el periodo se registraron <strong>{fCompacto(fem.total)}</strong> víctimas de feminicidio
-          {fem.total_2026 ? <> y <strong>{fEntero(fem.total_2026)}</strong> en el corte parcial de 2026 (ene–sep, suma municipal)</> : null}.
+          {fem.total_2026 ? <> y <strong>{fEntero(fem.total_2026)}</strong> en el corte parcial de 2026 ({d.meta.etiqueta_2026 ?? 'parcial'}, fuente estatal)</> : null}.
           {" "}{d.meta.fuente}
         </p>
       )}
@@ -66,7 +66,7 @@ export default function Victimas() {
   );
 }
 
-function TarjetaVictima({ f }: { f: DelitoVic }) {
+function TarjetaVictima({ f, etiqueta2026 }: { f: DelitoVic; etiqueta2026: string }) {
   const [volteada, setVolteada] = useState(false);
   const sceneRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<HTMLDivElement>(null);
@@ -129,7 +129,7 @@ function TarjetaVictima({ f }: { f: DelitoVic }) {
                 <div><dt><i className="vz-sw vz-sw--hom" /> Hombres</dt><dd>{fEntero(f.hombre)} <small>({ph.toFixed(1)}%)</small></dd></div>
                 <div><dt><i className="vz-sw vz-sw--ni" /> No identificado</dt><dd>{fEntero(f.no_identificado)} <small>({pn.toFixed(1)}%)</small></dd></div>
                 {f.pct_menores != null && <div><dt>Menores de edad</dt><dd>{f.pct_menores.toFixed(0)}% de las víctimas</dd></div>}
-                {f.total_2026 ? <div><dt>Corte 2026 (ene–sep)</dt><dd>{fEntero(f.total_2026)} víctimas</dd></div> : null}
+                {f.total_2026 ? <div><dt>Corte 2026 ({etiqueta2026})</dt><dd>{fEntero(f.total_2026)} víctimas</dd></div> : null}
               </dl>
             </div>
           </div>
