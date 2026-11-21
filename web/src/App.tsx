@@ -7,6 +7,7 @@ import Laboratorio from "./components/Laboratorio";
 import FranjaDelitos from "./components/FranjaDelitos";
 import Victimas from "./components/Victimas";
 import CorteReciente from "./components/CorteReciente";
+import Ambiente from "./components/Ambiente";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import Encabezado from "./components/Encabezado";
 import TarjetaHallazgo from "./components/TarjetaHallazgo";
@@ -163,6 +164,7 @@ export default function App() {
       <a className="visualmente-oculto" href="#contenido">Saltar al contenido</a>
       <Encabezado manifiesto={m} />
       <Efectos3D/>
+      <Ambiente/>
 
       <div className="filtros no-imprimir" role="region" aria-label="Filtros globales">
         <div className="contenedor">

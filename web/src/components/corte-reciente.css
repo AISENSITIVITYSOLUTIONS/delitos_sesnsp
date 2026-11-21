@@ -24,7 +24,7 @@
   background:radial-gradient(circle at var(--mx,25%) var(--my,0%),color-mix(in srgb,var(--tono) 30%,transparent),transparent 60%)}
 .corte-kpi:hover{box-shadow:inset 0 1px 0 #ffffff44,0 26px 40px #00000050,0 0 26px color-mix(in srgb,var(--tono) 26%,transparent)}
 .corte-kpi__etq{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);transform:translateZ(10px)}
-.corte-kpi__val{font-size:clamp(24px,2.4vw,34px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--ink);
+.corte-kpi__val{font-size:clamp(21px,1.95vw,29px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--ink);
   transform:translateZ(30px);text-shadow:0 3px 0 #00000026,0 0 26px color-mix(in srgb,var(--tono) 30%,transparent)}
 .corte-kpi__pie{font-size:12px;color:var(--ink-2);transform:translateZ(14px)}
 .corte-kpi__pie b{font-variant-numeric:tabular-nums}
@@ -72,3 +72,13 @@
   .corte-barra:not(.corte-barra--np){transform:none;transition:none}}
 [data-fx-paused=true] .corte__eyebrow i{animation-play-state:paused}
 @media print{.corte{box-shadow:none}.corte-kpi{transform:none;opacity:1;translate:0 0}.corte-barra:not(.corte-barra--np){transform:none}}
+
+/* Partículas y título por palabras (adaptados del hero de Decroly). */
+.campo-particulas{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.9;display:none}
+:root[data-theme="dark"] .campo-particulas{display:block}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .campo-particulas{display:block}}
+.corte__head h2{overflow:hidden;padding-bottom:.08em}
+.corte__w{display:inline-block;margin-right:.26em;opacity:0;transform:translateY(60%)}
+.corte--visible .corte__w{opacity:1;transform:none;transition:opacity .9s ease calc(var(--i)*70ms + 120ms),transform 1s cubic-bezier(.2,.7,.1,1) calc(var(--i)*70ms + 120ms)}
+@media(prefers-reduced-motion:reduce){.corte__w{opacity:1;transform:none;transition:none}}
+@media print{.campo-particulas{display:none!important}.corte__w{opacity:1;transform:none}}

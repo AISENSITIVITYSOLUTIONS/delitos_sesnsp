@@ -9,3 +9,9 @@ Los ornamentos animados solo se activan cuando son visibles. Se pausan al oculta
 Mapa: iluminación ambiental y direccional existente, nuevo modo de malla, resaltado de selección por cursor, alternancia perspectiva/ortográfica y transición de giro. Relieve regulable existente. El modo 3D requiere WebGL; la cartografía 2D sigue disponible. Las preferencias de apariencia no modifican valores ni denominadores.
 
 No se anuncian efectos de ray tracing, oclusión ambiental ni simulaciones físicas no implementadas. Las órbitas del encabezado son decorativas, no representan datos.
+
+## Adaptaciones del sitio Decroly — 21 de noviembre de 2026
+
+Se adoptaron solo los efectos compatibles con un tablero de datos: barra de progreso de lectura, luz tenue que sigue al cursor (tema oscuro), revelado de secciones al entrar en pantalla, entrada escalonada en 3D de las fichas, título por palabras y un campo de partículas WebGL en la sección «Último corte» (`Ambiente.tsx`, `CampoParticulas.tsx`). Las partículas son decorativas y no representan datos.
+
+No se adoptaron: desplazamiento suavizado (Lenis), porque interfiere con el zoom de mapas y gráficas; el carrusel en anillo, porque oculta la mayoría de las cifras a la vez; ni las transiciones de fotografía, que no aplican. Sin dependencias nuevas (no se añadió GSAP).
