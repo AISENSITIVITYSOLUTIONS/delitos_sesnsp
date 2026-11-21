@@ -1,0 +1,22 @@
+/* Ambiente (adaptado de Decroly): progreso de lectura, luz de cursor, revelados y entrada 3D de fichas. */
+.amb-progreso{position:fixed;inset:0 0 auto 0;height:2px;z-index:60;pointer-events:none;transform:scaleX(0);transform-origin:0 50%;
+  background:linear-gradient(90deg,#1b8dff,#38baff 55%,#2fd3b0);box-shadow:0 0 12px #38baff88}
+.amb-luz{display:none;position:fixed;left:-260px;top:-260px;width:520px;height:520px;z-index:1;pointer-events:none;border-radius:50%;
+  background:radial-gradient(circle,#4fc3ff14 0,#4fc3ff0a 35%,transparent 68%);mix-blend-mode:screen;will-change:transform}
+:root[data-theme="dark"] .amb-luz{display:block}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .amb-luz{display:block}}
+
+/* Revelado de secciones: solo opacidad antes de entrar; la transformación vive dentro de la animación
+   para no crear contextos que afecten elementos fijos o pegajosos una vez terminada. */
+html.amb .amb-espera{opacity:0}
+html.amb #contenido>section.amb-visto{animation:amb-sube .7s cubic-bezier(.2,.7,.1,1) both}
+@keyframes amb-sube{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+
+/* Fichas: entran una a una desde un lado, girando sobre su eje vertical. */
+html.amb .fd-strip.amb-espera{opacity:1}
+html.amb .fd-strip.amb-espera>.fd-scene{animation:none;opacity:0}
+html.amb .fd-strip.amb-visto>.fd-scene{animation:amb-ficha .85s cubic-bezier(.2,.7,.1,1) both;animation-delay:calc(var(--amb-i,0)*80ms)!important}
+@keyframes amb-ficha{from{opacity:0;transform:perspective(900px) translateX(70px) rotateY(-34deg)}to{opacity:1;transform:none}}
+
+@media(prefers-reduced-motion:reduce){.amb-luz{display:none!important}}
+@media print{.amb-progreso,.amb-luz{display:none!important}html.amb .amb-espera,html.amb .fd-strip.amb-espera>.fd-scene{opacity:1!important;animation:none!important}}
