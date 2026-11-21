@@ -1,0 +1,53 @@
+/* «Los diez delitos» como pista horizontal de fichas altas (adaptación de «Lo que pasa esta semana», Decroly):
+   una sola fila que se arrastra, fichas verticales con la serie como imagen de fondo y leyenda debajo. */
+.fd-pista-wrap{position:relative}
+.fd-pista-nav{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:2px 0 -6px}
+.fd-pista-pista{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-right:4px}
+.fd-pista-btn{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--ink);
+  font-size:18px;line-height:1;cursor:pointer;box-shadow:inset 0 1px 0 #ffffff1c,0 3px 0 #00000030;transition:transform .25s cubic-bezier(.2,.7,.1,1),border-color .25s}
+.fd-pista-btn:hover{transform:translateY(-2px);border-color:#56c4ff99}
+.fd-pista-btn:focus-visible{outline:2px solid #56c4ff;outline-offset:2px}
+
+.fd-strip.fd-strip--pista{display:flex;grid-template-columns:none;gap:14px;overflow-x:auto;overflow-y:hidden;padding:30px 60px 12px 4px;margin:0 -4px;
+  scroll-snap-type:x proximity;scrollbar-width:none;cursor:grab;user-select:none;-webkit-user-select:none;overscroll-behavior-x:contain;
+  mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 70px),transparent);-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 70px),transparent)}
+.fd-strip.fd-strip--pista::-webkit-scrollbar{display:none}
+.fd-strip.fd-strip--pista.es-arrastre{cursor:grabbing;scroll-snap-type:none}
+.fd-strip.fd-strip--pista.es-arrastre .fd-tilt{transform:none!important}
+.fd-strip--pista>.fd-scene{flex:0 0 auto;width:clamp(214px,19.5vw,272px);scroll-snap-align:start}
+.fd-strip--pista .fd-flip{min-height:clamp(380px,50vh,460px)}
+.fd-strip--pista .fd-tilt{transition:transform .5s cubic-bezier(.2,.7,.1,1)}
+.fd-strip--pista .fd-scene:hover .fd-card{translate:0 -6px}
+.fd-strip--pista .fd-card{transition:translate .5s cubic-bezier(.2,.7,.1,1),box-shadow .35s ease}
+
+/* Frente: arriba el rango y la tendencia; la serie ocupa el cuerpo como «imagen»; abajo, nombre y cifra. */
+.fd-strip--pista .fd-frente{display:flex;flex-direction:column}
+.fd-strip--pista .fd-frente .fd-metrica{display:contents}
+.fd-strip--pista .fd-frente .fd-top{order:0}
+.fd-strip--pista .fd-frente .fd-spark{order:1;flex:1 1 auto;height:auto;min-height:130px;margin:10px 0 8px;width:100%}
+.fd-strip--pista .fd-spark circle{display:none}
+.fd-strip--pista .fd-frente .fd-nombre{order:2;font-family:var(--serif);font-weight:500;font-size:clamp(19px,1.55vw,23px);line-height:1.08;letter-spacing:-.015em;margin-top:0;text-wrap:balance}
+.fd-strip--pista .fd-frente .fd-cifra{order:3;margin-top:6px;font-size:clamp(26px,2.3vw,32px);color:color-mix(in srgb,var(--hue) 55%,var(--ink))}
+.fd-strip--pista .fd-frente .fd-sub{display:none}
+.fd-strip--pista .fd-frente .fd-cue{order:4;margin-top:8px}
+.fd-strip--pista .fd-spark .fd-area{fill:color-mix(in srgb,var(--hue) 24%,transparent)}
+.fd-strip--pista .fd-spark .fd-linea{stroke-width:2.4}
+.fd-strip--pista .fd-frente::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
+  background:radial-gradient(120% 70% at 50% 62%,color-mix(in srgb,var(--hue) 20%,transparent),transparent 70%)}
+
+.fd-leyenda{display:none}
+.fd-strip--pista .fd-leyenda{display:block;margin:10px 2px 0;font-family:var(--serif);font-size:14px;line-height:1.25;color:var(--ink-2)}
+
+@media(max-width:640px){.fd-pista-pista{display:none}.fd-strip.fd-strip--pista{padding-right:36px;scroll-snap-type:x mandatory}
+  .fd-strip--pista>.fd-scene{width:min(72vw,260px)}.fd-strip--pista .fd-flip{min-height:380px}}
+@media(hover:none),(pointer:coarse){.fd-strip--pista .fd-scene:hover .fd-card{translate:none}}
+@media print{.fd-strip.fd-strip--pista{display:grid;grid-template-columns:repeat(3,1fr);overflow:visible;mask-image:none;-webkit-mask-image:none;padding:0}
+  .fd-strip--pista>.fd-scene{width:auto}.fd-strip--pista .fd-flip{min-height:0}}
+
+/* La serie estirada no admite el trazo por guiones (escala no uniforme): se revela con un barrido. */
+.fd-strip--pista .fd-spark .fd-linea{stroke-dasharray:none!important;stroke-dashoffset:0!important;animation:none!important}
+.fd-strip--pista .fd-spark .fd-area{animation:none!important;opacity:1}
+.fd-strip--pista .fd-spark{animation:pista-barrido 1.5s cubic-bezier(.2,.7,.1,1) both;animation-delay:.25s}
+@keyframes pista-barrido{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@media(prefers-reduced-motion:reduce){.fd-strip--pista .fd-spark{animation:none}}
+@media print{.fd-strip--pista .fd-spark{animation:none}}
