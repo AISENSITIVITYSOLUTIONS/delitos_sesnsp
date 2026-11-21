@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as RPointerEvent } from "react";
 import type { SeriesNacionales } from "../lib/contratos";
 import { fEntero, fMesLargo, fPct, fAcumulado } from "../lib/formato";
+import CampoParticulas from "./CampoParticulas";
 import "./corte-reciente.css";
 
 const CORTOS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -81,6 +82,7 @@ export default function CorteReciente({ nr }: { nr: SeriesNacionales | null }) {
   if (!nr || !c) return null;
   const [anio, mes] = c.ym.split("-").map(Number);
   const nombreMes = fMesLargo(c.ym);
+  const titulo = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
   const mesPrevio = c.idx > 0 ? CORTOS[Number(nr.meses[c.idx - 1].slice(5, 7)) - 1] : "";
   const varMes = c.previo ? (c.actual / c.previo - 1) * 100 : null;
   const varDiario = c.diarioPrevio ? (c.diario / c.diarioPrevio - 1) * 100 : null;
@@ -88,10 +90,13 @@ export default function CorteReciente({ nr }: { nr: SeriesNacionales | null }) {
 
   return (
     <section ref={ref} className={`seccion corte${visible ? " corte--visible" : ""}`} id="corte-reciente" aria-labelledby="t-corte">
+      <CampoParticulas />
       <div className="corte__head">
         <div>
           <span className="corte__eyebrow"><i aria-hidden="true" /> Último corte oficial · registro RNID</span>
-          <h2 id="t-corte">{nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)}</h2>
+          <h2 id="t-corte" aria-label={titulo}>
+            {titulo.split(" ").map((w, i) => <span key={i} aria-hidden="true" className="corte__w" style={{ "--i": i } as CSSProperties}>{w}</span>)}
+          </h2>
         </div>
         <p className="corte__desc">
           Delitos registrados en carpetas de investigación, total nacional. El registro vigente desde enero de {anio} no
